@@ -42,6 +42,11 @@ button {
     grid-template-columns: 1fr;
   }
 }
+.app.card-page {
+  grid-template-columns: 1fr;
+  max-width: 380px;
+  justify-items: center;
+}
 .eyebrow {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
@@ -253,34 +258,38 @@ textarea {
   margin-top: 24px;
   gap: 10px;
 }
-button.primary,
-button.ghost {
+.primary,
+.ghost {
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 11px 20px;
   border-radius: 8px;
   cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  box-sizing: border-box;
 }
-button.primary {
+.primary {
   background: var(--lime);
   color: #12151c;
   border: none;
 }
-button.primary:hover {
+.primary:hover {
   background: var(--lime-dim);
 }
-button.primary:disabled {
+.primary:disabled {
   background: #3a4152;
   color: var(--slate);
   cursor: not-allowed;
 }
-button.ghost {
+.ghost {
   background: transparent;
   border: 0.5px solid var(--line);
   color: var(--paper);
 }
-button.ghost:hover {
+.ghost:hover {
   border-color: var(--slate);
 }
 
@@ -521,4 +530,22 @@ button.ghost:hover {
   color: var(--slate);
   line-height: 1.6;
   margin-bottom: 20px;
+}
+
+.card-view-message {
+  color: var(--slate);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+  padding: 48px 8px;
+}
+.back-link {
+  margin-top: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--lime);
+  text-decoration: none;
+}
+.back-link:hover {
+  text-decoration: underline;
 }
