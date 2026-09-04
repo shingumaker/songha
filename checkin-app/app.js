@@ -63,20 +63,32 @@ function trailingStreak(days, idx) {
   while (i >= 0 && days[i]) { streak++; i--; }
   return streak;
 }
-function starSizeForRank(rank, big) {
-  const s = big
-    ? [{ box: 38, glow: 46, svg: 25, font: 12.5 }, { box: 32, glow: 38, svg: 20, font: 11 }, { box: 29, glow: 34, svg: 18, font: 10.5 }, { box: 26, glow: 32, svg: 17, font: 10 }]
-    : [{ box: 20, glow: 24, svg: 13, font: 7 }, { box: 17, glow: 21, svg: 11, font: 6.5 }, { box: 15, glow: 18, svg: 10, font: 6 }, { box: 13, glow: 16, svg: 9, font: 5.5 }];
-  if (rank === 1) return s[0];
-  if (rank === 2) return s[1];
-  if (rank === 3) return s[2];
-  return s[3];
+// 누적 점수 50점을 달성할 때마다 별이 하나씩 늘어나는 쌍둥이별(다중성) 형태로 표시한다.
+function starCountForScore(score) {
+  return Math.min(1 + Math.floor(score / 50), 4);
 }
-function hashJitter(id, salt) {
+const CLUSTER_OFFSETS = {
+  1: [[0, 0]],
+  2: [[-0.55, -0.15], [0.55, 0.15]],
+  3: [[-0.6, 0.35], [0.6, 0.35], [0, -0.55]],
+  4: [[-0.55, -0.35], [0.55, -0.35], [-0.45, 0.5], [0.45, 0.5]]
+};
+const CLUSTER_SCALE = { 1: 1, 2: 1.9, 3: 2.15, 4: 2.1 };
+function seededRand(seed) {
+  let t = (seed += 0x6D2B79F5);
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function idHash(id) {
   let h = 0;
-  const str = id + ":" + salt;
-  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-  return ((h % 1000) / 1000) - 0.5; // -0.5..0.5
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+// 학생 id + 날짜 인덱스로 별 위치를 매일 다르게(그러나 같은 날 안에서는 고정) 만든다.
+function dailyJitter(id, dayIdx, axisSalt) {
+  const seed = (idHash(id) ^ Math.imul(dayIdx + 1, 2654435761) ^ axisSalt) >>> 0;
+  return seededRand(seed) - 0.5; // -0.5..0.5
 }
 
 // ---------- Firestore 구독 ----------
@@ -163,27 +175,31 @@ function computeDerived() {
 }
 
 // ---------- 렌더: 별자리 ----------
-function renderConstellation(perStudent, rankByName, isActiveToday, big) {
+function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
     return `<div class="constellation-bg" style="height:${big ? 220 : 150}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
   }
+  const base = big ? { box: 24, glow: 29, svg: 15, font: 9 } : { box: 14, glow: 17, svg: 9, font: 5.5 };
   const stars = perStudent.map((p, idx) => {
     const row = Math.floor(idx / 3), col = idx % 3;
-    const jx = hashJitter(p.id, "x") * 14;
-    const jy = hashJitter(p.id, "y") * 10;
+    const jx = dailyJitter(p.id, dayIdx, 0) * 14;
+    const jy = dailyJitter(p.id, dayIdx, 0x9e3779b9) * 10;
     const x = (CELL_X[col] + jx).toFixed(1);
     const y = (CELL_Y[row] + jy).toFixed(1);
     const color = STAR_COLORS[idx % STAR_COLORS.length];
     if (p.doneToday) {
-      const size = starSizeForRank(rankByName[p.name] || null, big);
-      return `<div class="star" style="left:${x}%;top:${y}%;">
-        <div style="position:relative;width:${size.box}px;height:${size.box}px;display:flex;align-items:center;justify-content:center;">
-          <div class="star-glow" style="width:${size.glow}px;height:${size.glow}px;background:radial-gradient(circle, ${color}66, transparent 70%);"></div>
-          <svg width="${size.svg}" height="${size.svg}" viewBox="0 0 24 24" style="position:relative;">
+      const n = starCountForScore(p.count * 5);
+      const clusterSize = Math.round(base.box * CLUSTER_SCALE[n]);
+      const starsHtml = CLUSTER_OFFSETS[n].map(([ox, oy]) => `
+        <div style="position:absolute; left:calc(50% + ${(ox * base.box).toFixed(1)}px); top:calc(50% + ${(oy * base.box).toFixed(1)}px); transform:translate(-50%,-50%); width:${base.box}px; height:${base.box}px; display:flex; align-items:center; justify-content:center;">
+          <div class="star-glow" style="width:${base.glow}px;height:${base.glow}px;background:radial-gradient(circle, ${color}66, transparent 70%);"></div>
+          <svg width="${base.svg}" height="${base.svg}" viewBox="0 0 24 24" style="position:relative;">
             <path d="M12 0 C12.8 6 13.5 8.5 24 12 C13.5 15.5 12.8 18 12 24 C11.2 18 10.5 15.5 0 12 C10.5 8.5 11.2 6 12 0 Z" fill="${color}"></path>
           </svg>
-        </div>
-        <div class="star-name" style="font-size:${size.font}px;">${p.name}</div>
+        </div>`).join("");
+      return `<div class="star" style="left:${x}%;top:${y}%;">
+        <div style="position:relative;width:${clusterSize}px;height:${clusterSize}px;">${starsHtml}</div>
+        <div class="star-name" style="font-size:${base.font}px;">${p.name}</div>
       </div>`;
     }
     return `<div class="star" style="left:${x}%;top:${y}%;"><div class="star-pending"></div></div>`;
@@ -261,7 +277,7 @@ function renderStudentScreen(myId) {
         <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
         <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
       </div>
-      ${renderConstellation(d.perStudent, d.rankByName, d.isActiveToday, true)}
+      ${renderConstellation(d.perStudent, d.isActiveToday, true, d.idx)}
     </div>
 
     <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
@@ -375,7 +391,7 @@ function renderAdminScreen() {
         <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
         <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
       </div>
-      ${renderConstellation(d.perStudent, d.rankByName, d.isActiveToday, false)}
+      ${renderConstellation(d.perStudent, d.isActiveToday, false, d.idx)}
     </div>
 
     <div class="rank-cols" style="margin-bottom:20px;">
