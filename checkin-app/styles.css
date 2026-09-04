@@ -205,6 +205,21 @@ h1 {
 .rank-cols { display: grid; grid-template-columns: 1fr; gap: 10px; }
 @media (min-width: 620px) { .rank-cols { grid-template-columns: 1fr 1fr; } }
 
+.swipe-hint {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--sub);
+  text-align: right; margin-bottom: 8px; letter-spacing: 0.06em;
+}
+.swipe-track {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.swipe-track::-webkit-scrollbar { display: none; }
+.swipe-page { scroll-snap-align: start; flex: 0 0 100%; min-width: 0; }
+.swipe-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.swipe-dots { display: flex; justify-content: center; gap: 5px; margin-top: 10px; }
+.swipe-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--line); }
+.swipe-dots span.on { background: var(--cyan); }
+
 .pin-gate {
   max-width: 320px; margin: 60px auto 0; text-align: center;
 }
