@@ -20,10 +20,6 @@ const STUDENTS = [
 const TOTAL_DAYS = 33;
 const START_YEAR = 2026, START_MONTH = 8, START_DATE = 1; // 2026-09-01
 const STAR_COLORS = ["#EAF2FF", "#FFFFFF", "#FFE9C2", "#FFC9A6"];
-// 학생 10명을 5열x2행으로 고르게 배치 (별 뭉치가 커져도 옆줄과 안 겹치도록 여유 있게)
-const GRID_COLS = 5;
-const CELL_X = [10, 28, 46, 64, 82];
-const CELL_Y = [30, 70];
 
 // ---------- Firebase ----------
 const app = initializeApp(firebaseConfig);
@@ -34,7 +30,8 @@ const checkinsCol = collection(db, "checkins");
 const state = {
   data: {},      // { [studentId]: { name, days:[33 bool], times:{ [dayIdx]: ms } } }
   loaded: false,
-  route: "student"
+  route: "student",
+  adminSelected: 0 // 모바일 관리자 화면에서 선택된 학생 index
 };
 
 // ---------- 날짜 유틸 ----------
@@ -108,10 +105,39 @@ function idHash(id) {
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
   return h;
 }
-// 학생 id + 날짜 인덱스로 별 위치를 매일 다르게(그러나 같은 날 안에서는 고정) 만든다.
-function dailyJitter(id, dayIdx, axisSalt) {
-  const seed = (idHash(id) ^ Math.imul(dayIdx + 1, 2654435761) ^ axisSalt) >>> 0;
-  return seededRand(seed) - 0.5; // -0.5..0.5
+// 학생 id + 날짜 인덱스로 0~1 사이 의사난수를 만든다. (같은 날 안에서는 고정, 날짜가 바뀌면 값도 바뀜)
+function dailySeed01(id, dayIdx, salt) {
+  const seed = (idHash(id) ^ Math.imul(dayIdx + 1, 2654435761) ^ salt) >>> 0;
+  return seededRand(seed);
+}
+
+// 격자에 줄 세우지 않고, 학생마다 매일 다른 위치를 자유롭게 흩뿌린다.
+// 후보 여러 개 중 기존에 배치된 별들과 가장 멀리 떨어진 자리를 골라 겹침을 줄인다.
+function scatterPositions(perStudent, dayIdx) {
+  const marginX = 10, marginY = 15;
+  const spanX = 100 - marginX * 2, spanY = 100 - marginY * 2;
+  const placed = [];
+  perStudent.forEach((p) => {
+    let best = null;
+    let bestScore = -1;
+    const candidateCount = 10;
+    for (let c = 0; c < candidateCount; c++) {
+      const rx = dailySeed01(p.id, dayIdx, 0x1000 + c);
+      const ry = dailySeed01(p.id, dayIdx, 0x2000 + c);
+      const x = marginX + rx * spanX;
+      const y = marginY + ry * spanY;
+      let minDist = Infinity;
+      for (const q of placed) {
+        const dx = x - q.x, dy = (y - q.y) * 1.6; // 세로는 더 여유 있게 취급
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < minDist) minDist = dist;
+      }
+      if (placed.length === 0) minDist = 999;
+      if (minDist > bestScore) { bestScore = minDist; best = { x, y }; }
+    }
+    placed.push(best);
+  });
+  return placed;
 }
 
 // ---------- Firestore 구독 ----------
@@ -202,12 +228,10 @@ function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
     return `<div class="constellation-bg" style="height:${big ? 220 : 150}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
   }
+  const positions = scatterPositions(perStudent, dayIdx);
   const stars = perStudent.map((p, idx) => {
-    const row = Math.floor(idx / GRID_COLS), col = idx % GRID_COLS;
-    const jx = dailyJitter(p.id, dayIdx, 0) * 8;
-    const jy = dailyJitter(p.id, dayIdx, 0x9e3779b9) * 10;
-    const x = (CELL_X[col] + jx).toFixed(1);
-    const y = (CELL_Y[row] + jy).toFixed(1);
+    const x = positions[idx].x.toFixed(1);
+    const y = positions[idx].y.toFixed(1);
     const color = STAR_COLORS[idx % STAR_COLORS.length];
     if (p.doneToday) {
       const base = starSizeForCount(p.count, big);
@@ -402,7 +426,7 @@ function renderAdminScreen() {
       <div class="rank-meta">${c.count * 5}점</div>
     </div>`).join("");
 
-  // 체크 관리 테이블
+  // 체크 관리 테이블 (데스크탑: 전체 표 / 모바일: 학생 선택 + 개인 그리드)
   let headCells = "";
   for (let i = 0; i < TOTAL_DAYS; i++) {
     if (i === 30) headCells += `<th class="gap-col"></th>`;
@@ -429,6 +453,27 @@ function renderAdminScreen() {
       <td class="manage-score-col">${p.count}일 · ${p.count * 5}점</td>
     </tr>`;
   });
+
+  const selIdx = clamp(state.adminSelected, 0, d.perStudent.length - 1);
+  const selP = d.perStudent[selIdx];
+  const chips = d.perStudent.map((p, i) => `
+    <button class="chip-btn ${i === selIdx ? "on" : ""}" data-action="select-admin-student" data-idx="${i}">${p.name}</button>
+  `).join("");
+  const selCells = [];
+  for (let i = 0; i < TOTAL_DAYS; i++) {
+    const isChecked = !!selP.rec.days[i];
+    const isToday = d.isActiveToday && i === d.idx;
+    const isFuture = d.isActiveToday ? i > d.idx : i > d.refIdx;
+    const bg = isChecked ? "var(--cyan)" : (isFuture ? "transparent" : "#171B36");
+    let border = "1.5px solid transparent";
+    if (isToday) border = "1.5px solid var(--gold)";
+    else if (isFuture && !isChecked) border = "1.5px dashed var(--sub)";
+    selCells.push(`
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+        <div class="day-cell" data-action="toggle-cell" data-sid="${selP.id}" data-day="${i}" style="width:100%;height:22px;background:${bg};border:${border};" title="${dateLabel(i)}"></div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:${isToday ? "var(--gold)" : "var(--sub)"};">${dateShort(i)}</div>
+      </div>`);
+  }
 
   return `
     <div class="eyebrow">MISSION CONTROL</div>
@@ -457,12 +502,27 @@ function renderAdminScreen() {
     </div>
 
     <div class="section-label">체크 관리</div>
-    <div class="legend">셀 클릭 = 날짜별 체크 직접 수정 · 금색 = 오늘 · 점선 = 아직 지나지 않은 날 · 가로로 스크롤하면 전체 날짜가 보여요</div>
-    <div class="manage-wrap">
-      <table class="manage-table">
-        <thead><tr><th></th>${headCells}<th></th><th></th></tr></thead>
-        <tbody>${bodyRows}</tbody>
-      </table>
+
+    <div class="desktop-only">
+      <div class="legend">셀 클릭 = 날짜별 체크 직접 수정 · 금색 = 오늘 · 점선 = 아직 지나지 않은 날 · 가로로 스크롤하면 전체 날짜가 보여요</div>
+      <div class="manage-wrap">
+        <table class="manage-table">
+          <thead><tr><th></th>${headCells}<th></th><th></th></tr></thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mobile-only">
+      <div class="legend">학생을 선택하고 날짜 칸을 눌러 체크를 직접 수정하세요 · 금색 = 오늘</div>
+      <div class="chip-row">${chips}</div>
+      <div class="card">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-weight:700;font-size:15px;">${selP.name}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);">${selP.percent}% · ${selP.count}일 · ${selP.count * 5}점</div>
+        </div>
+        <div class="flight-log-grid">${selCells.join("")}</div>
+      </div>
     </div>
 
     <div class="link-row">
@@ -522,6 +582,9 @@ document.addEventListener("click", (e) => {
     if (myId && idx >= 0 && idx < TOTAL_DAYS) toggleDay(myId, idx);
   } else if (action === "toggle-cell") {
     toggleDay(el.dataset.sid, Number(el.dataset.day));
+  } else if (action === "select-admin-student") {
+    state.adminSelected = Number(el.dataset.idx);
+    render();
   }
 });
 
