@@ -14,13 +14,16 @@ const STUDENTS = [
   { id: "s6", name: "김성현" },
   { id: "s7", name: "김지유" },
   { id: "s8", name: "김세린" },
-  { id: "s9", name: "이다은" }
+  { id: "s9", name: "이다은" },
+  { id: "s10", name: "김송하" }
 ];
 const TOTAL_DAYS = 33;
 const START_YEAR = 2026, START_MONTH = 8, START_DATE = 1; // 2026-09-01
 const STAR_COLORS = ["#EAF2FF", "#FFFFFF", "#FFE9C2", "#FFC9A6"];
-const CELL_X = [20, 50, 80];
-const CELL_Y = [24, 50, 76];
+// 학생 10명을 5열x2행으로 고르게 배치 (별 뭉치가 커져도 옆줄과 안 겹치도록 여유 있게)
+const GRID_COLS = 5;
+const CELL_X = [10, 28, 46, 64, 82];
+const CELL_Y = [30, 70];
 
 // ---------- Firebase ----------
 const app = initializeApp(firebaseConfig);
@@ -63,9 +66,10 @@ function trailingStreak(days, idx) {
   while (i >= 0 && days[i]) { streak++; i--; }
   return streak;
 }
-// 누적 점수 50점을 달성할 때마다 별이 하나씩 늘어나는 쌍둥이별(다중성) 형태로 표시한다.
+// 누적 점수 30점을 달성할 때마다 별이 하나씩 늘어나는 쌍둥이별(다중성) 형태로 표시한다.
+// (33일 만점 165점 기준 최대 6개)
 function starCountForScore(score) {
-  return Math.min(1 + Math.floor(score / 50), 4);
+  return Math.min(1 + Math.floor(score / 30), 6);
 }
 const CLUSTER_OFFSETS = {
   1: [[0, 0]],
@@ -73,7 +77,26 @@ const CLUSTER_OFFSETS = {
   3: [[-0.6, 0.35], [0.6, 0.35], [0, -0.55]],
   4: [[-0.55, -0.35], [0.55, -0.35], [-0.45, 0.5], [0.45, 0.5]]
 };
-const CLUSTER_SCALE = { 1: 1, 2: 1.9, 3: 2.15, 4: 2.1 };
+const CLUSTER_SCALE = { 1: 1, 2: 1.9, 3: 2.15, 4: 2.1, 5: 2.5, 6: 2.5 };
+function clusterOffsets(n) {
+  if (CLUSTER_OFFSETS[n]) return CLUSTER_OFFSETS[n];
+  // 5개 이상은 원형으로 고르게 배치
+  const offs = [];
+  for (let i = 0; i < n; i++) {
+    const theta = (2 * Math.PI * i) / n - Math.PI / 2;
+    offs.push([0.62 * Math.cos(theta), 0.62 * Math.sin(theta)]);
+  }
+  return offs;
+}
+// 체크한 날(=5점 단위)마다 별 크기를 조금씩 키운다.
+function starSizeForCount(count, big) {
+  const range = big
+    ? { box: [22, 36], glow: [27, 42], svg: [14, 22], font: [8, 11.5] }
+    : { box: [12, 19], glow: [15, 23], svg: [8, 12], font: [5, 6.8] };
+  const t = Math.max(0, Math.min(1, count / TOTAL_DAYS));
+  const lerp = ([a, b]) => Math.round((a + (b - a) * t) * 10) / 10;
+  return { box: lerp(range.box), glow: lerp(range.glow), svg: Math.round(lerp(range.svg)), font: lerp(range.font) };
+}
 function seededRand(seed) {
   let t = (seed += 0x6D2B79F5);
   t = Math.imul(t ^ (t >>> 15), t | 1);
@@ -179,18 +202,18 @@ function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
     return `<div class="constellation-bg" style="height:${big ? 220 : 150}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
   }
-  const base = big ? { box: 24, glow: 29, svg: 15, font: 9 } : { box: 14, glow: 17, svg: 9, font: 5.5 };
   const stars = perStudent.map((p, idx) => {
-    const row = Math.floor(idx / 3), col = idx % 3;
-    const jx = dailyJitter(p.id, dayIdx, 0) * 14;
+    const row = Math.floor(idx / GRID_COLS), col = idx % GRID_COLS;
+    const jx = dailyJitter(p.id, dayIdx, 0) * 8;
     const jy = dailyJitter(p.id, dayIdx, 0x9e3779b9) * 10;
     const x = (CELL_X[col] + jx).toFixed(1);
     const y = (CELL_Y[row] + jy).toFixed(1);
     const color = STAR_COLORS[idx % STAR_COLORS.length];
     if (p.doneToday) {
+      const base = starSizeForCount(p.count, big);
       const n = starCountForScore(p.count * 5);
       const clusterSize = Math.round(base.box * CLUSTER_SCALE[n]);
-      const starsHtml = CLUSTER_OFFSETS[n].map(([ox, oy]) => `
+      const starsHtml = clusterOffsets(n).map(([ox, oy]) => `
         <div style="position:absolute; left:calc(50% + ${(ox * base.box).toFixed(1)}px); top:calc(50% + ${(oy * base.box).toFixed(1)}px); transform:translate(-50%,-50%); width:${base.box}px; height:${base.box}px; display:flex; align-items:center; justify-content:center;">
           <div class="star-glow" style="width:${base.glow}px;height:${base.glow}px;background:radial-gradient(circle, ${color}66, transparent 70%);"></div>
           <svg width="${base.svg}" height="${base.svg}" viewBox="0 0 24 24" style="position:relative;">
