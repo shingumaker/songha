@@ -257,6 +257,22 @@ h1 {
 }
 .badge.on { color: var(--cyan); border-color: var(--cyan); }
 
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.chip-btn {
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+  color: var(--star); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  padding: 7px 13px; cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.chip-btn.on { background: var(--cyan); color: #0B0E1F; border-color: var(--cyan); }
+
+/* 체크 관리: 데스크탑은 전체 표, 모바일은 학생 선택 + 개인 그리드 */
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+@media (max-width: 720px) {
+  .desktop-only { display: none; }
+  .mobile-only { display: block; }
+}
+
 .legend {
   font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--sub);
   line-height: 1.5; margin-bottom: 10px;
