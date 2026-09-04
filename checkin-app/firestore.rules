@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // checkins/{studentId} 문서만 열어둡니다. 다른 컬렉션은 기본적으로 전부 차단됩니다.
+    // 로그인 없이 학생들이 직접 쓰게 하기 위해 의도적으로 열어둔 규칙입니다 —
+    // 링크를 아는 사람은 누구나 읽고 쓸 수 있다는 뜻이니, 외부에 함부로 공유하지 마세요.
+    match /checkins/{studentId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasOnly(['name', 'days', 'times'])
+                   && request.resource.data.name is string
+                   && request.resource.data.days is list
+                   && request.resource.data.days.size() == 33;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
