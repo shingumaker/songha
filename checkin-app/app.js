@@ -15,7 +15,8 @@ const STUDENTS = [
   { id: "s7", name: "김지유" },
   { id: "s8", name: "김세린" },
   { id: "s9", name: "이다은" },
-  { id: "s10", name: "김송하" }
+  { id: "s10", name: "김송하" },
+  { id: "s11", name: "김명성" }
 ];
 const TOTAL_DAYS = 33;
 const START_YEAR = 2026, START_MONTH = 8, START_DATE = 1; // 2026-09-01
@@ -330,29 +331,22 @@ function renderStudentScreen(myId) {
     <div class="sub" style="margin-bottom:16px;">2026.09.01 – 2026.10.03 · 총 ${TOTAL_DAYS}일</div>
 
     <div class="card" style="margin-bottom:14px;">
-      <div class="swipe-hint">← 좌우로 스와이프 →</div>
-      <div class="swipe-track">
-        <div class="swipe-page">
-          <div class="panel-head">
-            <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
-            <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
-          </div>
-          ${renderConstellation(d.perStudent, d.isActiveToday, true, d.idx)}
-        </div>
-        <div class="swipe-page">
-          <div class="swipe-cols">
-            <div>
-              <div class="panel-title" style="color:var(--gold);margin-bottom:8px;"><span class="live-dot" style="background:var(--gold);box-shadow:0 0 4px var(--gold);"></span>오늘의 랭킹</div>
-              ${rankRowsHtml(d.todayArrivals.map((a, i) => ({ rank: i + 1, name: a.name, meta: formatTime(a.time) })), "오늘 체크한 학생이 없어요")}
-            </div>
-            <div>
-              <div class="panel-title" style="color:var(--violet);margin-bottom:8px;"><span class="live-dot" style="background:var(--violet);box-shadow:0 0 4px var(--violet);"></span>누적랭킹</div>
-              ${rankRowsHtml(d.cumulative.map((c, i) => ({ rank: i + 1, name: c.name, meta: (c.count * 5) + "점" })), "")}
-            </div>
-          </div>
-        </div>
+      <div class="panel-head">
+        <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
+        <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
       </div>
-      <div class="swipe-dots"><span class="on"></span><span></span></div>
+      ${renderConstellation(d.perStudent, d.isActiveToday, true, d.idx)}
+    </div>
+
+    <div class="rank-cols" style="margin-bottom:14px;">
+      <div class="card">
+        <div class="panel-title" style="color:var(--gold);margin-bottom:8px;"><span class="live-dot" style="background:var(--gold);box-shadow:0 0 4px var(--gold);"></span>오늘의 랭킹</div>
+        ${rankRowsHtml(d.todayArrivals.map((a, i) => ({ rank: i + 1, name: a.name, meta: formatTime(a.time) })), "오늘 체크한 학생이 없어요")}
+      </div>
+      <div class="card">
+        <div class="panel-title" style="color:var(--violet);margin-bottom:8px;"><span class="live-dot" style="background:var(--violet);box-shadow:0 0 4px var(--violet);"></span>누적랭킹</div>
+        ${rankRowsHtml(d.cumulative.map((c, i) => ({ rank: i + 1, name: c.name, meta: (c.count * 5) + "점" })), "")}
+      </div>
     </div>
 
     <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
