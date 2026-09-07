@@ -227,7 +227,7 @@ function computeDerived() {
 // ---------- 렌더: 별자리 ----------
 function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
-    return `<div class="constellation-bg" style="height:${big ? 220 : 230}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
+    return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
   }
   const positions = scatterPositions(perStudent, dayIdx);
   const stars = perStudent.map((p, idx) => {
@@ -252,7 +252,7 @@ function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
     }
     return `<div class="star" style="left:${x}%;top:${y}%;"><div class="star-pending"></div></div>`;
   }).join("");
-  return `<div class="constellation-bg" style="height:${big ? 220 : 230}px;">${stars}</div>`;
+  return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;">${stars}</div>`;
 }
 
 function ringGauge(percent, size, holeSize, fontSize) {
