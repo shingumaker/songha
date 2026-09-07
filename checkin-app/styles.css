@@ -139,11 +139,11 @@ h1 {
 }
 .star-pending { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.28); }
 .verse-overlay {
-  position: absolute; left: 0; right: 0; bottom: 8px;
+  position: absolute; left: 0; right: 0; bottom: 6px;
   text-align: center; white-space: nowrap; pointer-events: none;
-  font-family: 'Nanum Myeongjo', serif; color: rgba(234,242,255,0.4);
-  font-size: clamp(8px, 2.3vw, 11px); letter-spacing: 0.01em;
-  overflow: hidden; text-overflow: ellipsis; padding: 0 6px;
+  font-family: 'Nanum Myeongjo', serif; color: rgba(234,242,255,0.45);
+  font-size: clamp(7px, 2.2vw, 12px); letter-spacing: -0.01em;
+  overflow: hidden; padding: 0 3px;
 }
 .save-shot-btn {
   font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
@@ -305,7 +305,7 @@ h1 {
   font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.7;
 }
 .verse-line {
-  margin: 14px auto 0; font-family: 'Nanum Myeongjo', serif; color: var(--star);
-  font-size: clamp(9px, 3vw, 13px); line-height: 1.6; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  margin: 14px -20px 0; padding: 0 6px; font-family: 'Nanum Myeongjo', serif; color: var(--star);
+  font-size: clamp(7.5px, 2.4vw, 13px); line-height: 1.6; white-space: nowrap;
+  letter-spacing: -0.01em; overflow: hidden; text-align: center;
 }
