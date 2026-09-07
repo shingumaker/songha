@@ -649,7 +649,11 @@ async function saveConstellationShot(btnEl, dayIdx) {
   btnEl.textContent = "저장 중...";
   btnEl.disabled = true;
   try {
-    const canvas = await window.html2canvas(target, { backgroundColor: "#05070d", scale: 2 });
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 15000));
+    const canvas = await Promise.race([
+      window.html2canvas(target, { backgroundColor: "#05070d", scale: 2 }),
+      timeout
+    ]);
     const link = document.createElement("a");
     link.download = `constellation_${dateAt(dayIdx).getFullYear()}-${String(dateAt(dayIdx).getMonth() + 1).padStart(2, "0")}-${String(dateAt(dayIdx).getDate()).padStart(2, "0")}.png`;
     link.href = canvas.toDataURL("image/png");
