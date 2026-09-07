@@ -19,6 +19,7 @@ const STUDENTS = [
   { id: "s11", name: "김명성" }
 ];
 const TOTAL_DAYS = 33;
+const VERSE_TEXT = "많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이 영원토록 빛나리라 -단 12:3-";
 const START_YEAR = 2026, START_MONTH = 8, START_DATE = 1; // 2026-09-01
 const STAR_COLORS = ["#EAF2FF", "#FFFFFF", "#FFE9C2", "#FFC9A6"];
 
@@ -239,7 +240,7 @@ function perStudentForDay(dayIdx) {
 // ---------- 렌더: 별자리 ----------
 function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
-    return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
+    return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div><div class="verse-overlay">${VERSE_TEXT}</div></div>`;
   }
   const positions = scatterPositions(perStudent, dayIdx);
   const stars = perStudent.map((p, idx) => {
@@ -264,7 +265,7 @@ function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
     }
     return `<div class="star" style="left:${x}%;top:${y}%;"><div class="star-pending"></div></div>`;
   }).join("");
-  return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;">${stars}</div>`;
+  return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;">${stars}<div class="verse-overlay">${VERSE_TEXT}</div></div>`;
 }
 
 function ringGauge(percent, size, holeSize, fontSize) {
@@ -586,7 +587,7 @@ function render() {
   const bg = `<div class="starfield-bg"></div>`;
 
   if (!state.loaded) {
-    app.innerHTML = bg + `<div class="empty-notice">불러오는 중...</div>`;
+    app.innerHTML = bg + `<div class="empty-notice">불러오는 중...<div class="verse-line">${VERSE_TEXT}</div></div>`;
     return;
   }
   if (state.loaded === "error") {
