@@ -138,6 +138,13 @@ h1 {
   margin-top: 2px; white-space: nowrap;
 }
 .star-pending { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.28); }
+.verse-overlay {
+  position: absolute; left: 0; right: 0; bottom: 8px;
+  text-align: center; white-space: nowrap; pointer-events: none;
+  font-family: 'Nanum Myeongjo', serif; color: rgba(234,242,255,0.4);
+  font-size: clamp(8px, 2.3vw, 11px); letter-spacing: 0.01em;
+  overflow: hidden; text-overflow: ellipsis; padding: 0 6px;
+}
 .save-shot-btn {
   font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
   color: var(--cyan); background: rgba(79,209,232,0.1);
@@ -296,4 +303,9 @@ h1 {
 .empty-notice {
   text-align: center; padding: 40px 20px; color: var(--sub);
   font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.7;
+}
+.verse-line {
+  margin: 14px auto 0; font-family: 'Nanum Myeongjo', serif; color: var(--star);
+  font-size: clamp(9px, 3vw, 13px); line-height: 1.6; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 100%;
 }
