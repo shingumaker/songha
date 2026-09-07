@@ -33,7 +33,8 @@ const state = {
   loaded: false,
   route: "student",
   adminSelected: 0, // 모바일 관리자 화면에서 선택된 학생 index
-  gallerySelectedDay: null // 관리자 화면 별자리 갤러리에서 선택된 날짜 index
+  gallerySelectedDay: null, // 관리자 화면 별자리 갤러리에서 선택된 날짜 index
+  galleryOpen: false // 관리자 화면 별자리 갤러리 펼침 여부
 };
 
 // ---------- 날짜 유틸 ----------
@@ -528,14 +529,6 @@ function renderAdminScreen() {
       </div>
     </div>
 
-    <div class="card" style="margin-bottom:20px;">
-      <div class="panel-head">
-        <div class="panel-title" style="color:var(--gold);"><span class="live-dot" style="background:var(--gold);box-shadow:0 0 4px var(--gold);"></span>별자리 갤러리</div>
-        ${maxGalleryDay >= 0 ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${gsel}" title="사진으로 저장">📸 저장</button>` : ""}
-      </div>
-      ${galleryBody}
-    </div>
-
     <div class="section-label">체크 관리</div>
 
     <div class="desktop-only">
@@ -559,6 +552,20 @@ function renderAdminScreen() {
         <div class="flight-log-grid">${selCells.join("")}</div>
       </div>
     </div>
+
+    <div class="link-row" style="margin-bottom:${state.galleryOpen ? 10 : 20}px;">
+      <button class="link-btn" data-action="toggle-gallery">${state.galleryOpen ? "별자리 갤러리 숨기기 ▲" : "📸 별자리 갤러리 보기 ▼"}</button>
+    </div>
+
+    ${state.galleryOpen ? `
+    <div class="card" style="margin-bottom:20px;">
+      <div class="panel-head">
+        <div class="panel-title" style="color:var(--gold);"><span class="live-dot" style="background:var(--gold);box-shadow:0 0 4px var(--gold);"></span>별자리 갤러리</div>
+        ${maxGalleryDay >= 0 ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${gsel}" title="사진으로 저장">📸 저장</button>` : ""}
+      </div>
+      ${galleryBody}
+    </div>
+    ` : ""}
 
     <div class="link-row">
       <button class="link-btn" data-action="goto-student">학생 화면으로 ←</button>
@@ -625,12 +632,19 @@ document.addEventListener("click", (e) => {
   } else if (action === "select-gallery-day") {
     state.gallerySelectedDay = Number(el.dataset.day);
     render();
+  } else if (action === "toggle-gallery") {
+    state.galleryOpen = !state.galleryOpen;
+    render();
   }
 });
 
 async function saveConstellationShot(btnEl, dayIdx) {
   const target = btnEl.closest(".card").querySelector(".constellation-bg");
-  if (!target || !window.html2canvas) return;
+  if (!target) return;
+  if (!window.html2canvas) {
+    alert("사진 저장 기능을 불러오지 못했어요. 새로고침 후 다시 시도해주세요.");
+    return;
+  }
   const originalLabel = btnEl.textContent;
   btnEl.textContent = "저장 중...";
   btnEl.disabled = true;
