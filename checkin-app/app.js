@@ -32,7 +32,8 @@ const state = {
   data: {},      // { [studentId]: { name, days:[33 bool], times:{ [dayIdx]: ms } } }
   loaded: false,
   route: "student",
-  adminSelected: 0 // 모바일 관리자 화면에서 선택된 학생 index
+  adminSelected: 0, // 모바일 관리자 화면에서 선택된 학생 index
+  gallerySelectedDay: null // 관리자 화면 별자리 갤러리에서 선택된 날짜 index
 };
 
 // ---------- 날짜 유틸 ----------
@@ -222,6 +223,16 @@ function computeDerived() {
   const todayDoneCount = perStudent.filter((p) => p.doneToday).length;
 
   return { idx, isActiveToday, refIdx, elapsed, perStudent, todayArrivals, rankByName, cumulative, avgPercent, maxStreak, todayDoneCount };
+}
+
+// 관리자 갤러리: 지난 특정 날짜 기준으로 그날까지의 누적 점수/체크 여부를 재구성
+function perStudentForDay(dayIdx) {
+  return STUDENTS.map((st) => {
+    const rec = state.data[st.id] || { name: st.name, days: Array(TOTAL_DAYS).fill(false), times: {} };
+    const count = rec.days.slice(0, dayIdx + 1).filter(Boolean).length;
+    const doneToday = !!rec.days[dayIdx];
+    return { id: st.id, name: st.name, rec, count, doneToday };
+  });
 }
 
 // ---------- 렌더: 별자리 ----------
@@ -451,6 +462,22 @@ function renderAdminScreen() {
     </tr>`;
   });
 
+  // 별자리 갤러리: 지난 날짜의 별자리를 날짜 탭으로 골라 다시 그려서 보여줌
+  const maxGalleryDay = d.isActiveToday ? d.idx : (d.idx >= TOTAL_DAYS ? TOTAL_DAYS - 1 : -1);
+  let gsel = state.gallerySelectedDay;
+  if (gsel === null || gsel > maxGalleryDay) gsel = maxGalleryDay;
+  const galleryTabs = [];
+  for (let i = 0; i <= maxGalleryDay; i++) {
+    galleryTabs.push(`<button class="gallery-tab-btn ${i === gsel ? "on" : ""}" data-action="select-gallery-day" data-day="${i}">${dateLabel(i)}${d.isActiveToday && i === d.idx ? " · 오늘" : ""}</button>`);
+  }
+  const galleryBody = maxGalleryDay < 0
+    ? `<div class="star-empty" style="padding:16px 0;">아직 챌린지가 시작되지 않았어요</div>`
+    : `
+      <div class="gallery-tab-row">${galleryTabs.join("")}</div>
+      <div class="gallery-date-label">${dateAt(gsel).getFullYear()}.${String(dateAt(gsel).getMonth() + 1).padStart(2, "0")}.${String(dateAt(gsel).getDate()).padStart(2, "0")} · DAY ${gsel + 1} / ${TOTAL_DAYS}</div>
+      ${renderConstellation(perStudentForDay(gsel), true, false, gsel)}
+    `;
+
   const selIdx = clamp(state.adminSelected, 0, d.perStudent.length - 1);
   const selP = d.perStudent[selIdx];
   const chips = d.perStudent.map((p, i) => `
@@ -499,6 +526,14 @@ function renderAdminScreen() {
         <div class="panel-title" style="color:var(--violet);margin-bottom:8px;"><span class="live-dot" style="background:var(--violet);box-shadow:0 0 4px var(--violet);"></span>누적랭킹</div>
         ${cumulativeRows}
       </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="panel-head">
+        <div class="panel-title" style="color:var(--gold);"><span class="live-dot" style="background:var(--gold);box-shadow:0 0 4px var(--gold);"></span>별자리 갤러리</div>
+        ${maxGalleryDay >= 0 ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${gsel}" title="사진으로 저장">📸 저장</button>` : ""}
+      </div>
+      ${galleryBody}
     </div>
 
     <div class="section-label">체크 관리</div>
@@ -587,6 +622,9 @@ document.addEventListener("click", (e) => {
     render();
   } else if (action === "save-constellation") {
     saveConstellationShot(el, Number(el.dataset.day));
+  } else if (action === "select-gallery-day") {
+    state.gallerySelectedDay = Number(el.dataset.day);
+    render();
   }
 });
 
