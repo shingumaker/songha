@@ -360,7 +360,7 @@ function renderStudentScreen(myId) {
       </div>
       <div class="card">
         <div class="panel-title" style="color:var(--violet);margin-bottom:8px;"><span class="live-dot" style="background:var(--violet);box-shadow:0 0 4px var(--violet);"></span>누적랭킹</div>
-        ${rankRowsHtml(d.cumulative.map((c, i) => ({ rank: i + 1, name: c.name, meta: (c.count * 5) + "점" })), "")}
+        ${rankRowsHtml(d.cumulative.filter((c) => c.count * 5 >= 5).map((c, i) => ({ rank: i + 1, name: c.name, meta: (c.count * 5) + "점" })), "아직 5점 이상인 학생이 없어요")}
       </div>
     </div>
 
@@ -428,12 +428,15 @@ function renderAdminScreen() {
       </div>`).join("")
     : `<div class="star-empty" style="padding:16px 0;">${d.isActiveToday ? "아직 아무도 체크하지 않았어요" : "챌린지 기간이 아니에요"}</div>`;
 
-  const cumulativeRows = d.cumulative.map((c, i) => `
-    <div class="rank-row" style="background:${i === 0 ? "rgba(139,92,246,0.12)" : "transparent"};">
-      <div class="rank-num" style="color:${i === 0 ? "var(--violet)" : "var(--star)"};width:22px;">#${i + 1}</div>
-      <div class="rank-name">${c.name}</div>
-      <div class="rank-meta">${c.count * 5}점</div>
-    </div>`).join("");
+  const cumulativeQualified = d.cumulative.filter((c) => c.count * 5 >= 5);
+  const cumulativeRows = cumulativeQualified.length
+    ? cumulativeQualified.map((c, i) => `
+      <div class="rank-row" style="background:${i === 0 ? "rgba(139,92,246,0.12)" : "transparent"};">
+        <div class="rank-num" style="color:${i === 0 ? "var(--violet)" : "var(--star)"};width:22px;">#${i + 1}</div>
+        <div class="rank-name">${c.name}</div>
+        <div class="rank-meta">${c.count * 5}점</div>
+      </div>`).join("")
+    : `<div class="star-empty" style="padding:16px 0;">아직 5점 이상인 학생이 없어요</div>`;
 
   // 체크 관리 테이블 (데스크탑: 전체 표 / 모바일: 학생 선택 + 개인 그리드)
   let headCells = "";
