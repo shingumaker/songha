@@ -333,7 +333,10 @@ function renderStudentScreen(myId) {
     <div class="card" style="margin-bottom:14px;">
       <div class="panel-head">
         <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
-        <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
+          ${d.isActiveToday ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${d.idx}" title="사진으로 저장">📸 저장</button>` : ""}
+        </div>
       </div>
       ${renderConstellation(d.perStudent, d.isActiveToday, true, d.idx)}
     </div>
@@ -479,7 +482,10 @@ function renderAdminScreen() {
     <div class="card" style="margin-bottom:14px;">
       <div class="panel-head">
         <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
-        <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
+          ${d.isActiveToday ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${d.idx}" title="사진으로 저장">📸 저장</button>` : ""}
+        </div>
       </div>
       ${renderConstellation(d.perStudent, d.isActiveToday, false, d.idx)}
     </div>
@@ -579,8 +585,33 @@ document.addEventListener("click", (e) => {
   } else if (action === "select-admin-student") {
     state.adminSelected = Number(el.dataset.idx);
     render();
+  } else if (action === "save-constellation") {
+    saveConstellationShot(el, Number(el.dataset.day));
   }
 });
+
+async function saveConstellationShot(btnEl, dayIdx) {
+  const target = btnEl.closest(".card").querySelector(".constellation-bg");
+  if (!target || !window.html2canvas) return;
+  const originalLabel = btnEl.textContent;
+  btnEl.textContent = "저장 중...";
+  btnEl.disabled = true;
+  try {
+    const canvas = await window.html2canvas(target, { backgroundColor: "#05070d", scale: 2 });
+    const link = document.createElement("a");
+    link.download = `constellation_${dateAt(dayIdx).getFullYear()}-${String(dateAt(dayIdx).getMonth() + 1).padStart(2, "0")}-${String(dateAt(dayIdx).getDate()).padStart(2, "0")}.png`;
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (e) {
+    console.error("save shot failed", e);
+    alert("저장에 실패했어요. 다시 시도해주세요.");
+  } finally {
+    btnEl.textContent = originalLabel;
+    btnEl.disabled = false;
+  }
+}
 
 document.addEventListener("submit", (e) => {
   const form = e.target.closest('[data-action="pin-submit"]');

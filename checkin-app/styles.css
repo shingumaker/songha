@@ -138,6 +138,13 @@ h1 {
   margin-top: 2px; white-space: nowrap;
 }
 .star-pending { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.28); }
+.save-shot-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
+  color: var(--cyan); background: rgba(79,209,232,0.1);
+  border: 1px solid rgba(79,209,232,0.35); border-radius: 6px;
+  padding: 4px 8px; cursor: pointer; white-space: nowrap;
+}
+.save-shot-btn:disabled { opacity: 0.6; cursor: default; }
 
 .rank-row {
   display: flex; align-items: center; gap: 6px;
