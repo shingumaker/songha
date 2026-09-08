@@ -20,6 +20,7 @@ const STUDENTS = [
 ];
 const TOTAL_DAYS = 33;
 const VERSE_TEXT = "많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이 영원토록 빛나리라 -단 12:3-";
+const VERSE_TEXT_2LINE = "많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이<br>영원토록 빛나리라 -단 12:3-";
 const START_YEAR = 2026, START_MONTH = 8, START_DATE = 1; // 2026-09-01
 const STAR_COLORS = ["#EAF2FF", "#FFFFFF", "#FFE9C2", "#FFC9A6"];
 
@@ -240,7 +241,7 @@ function perStudentForDay(dayIdx) {
 // ---------- 렌더: 별자리 ----------
 function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
-    return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div><div class="verse-overlay">${VERSE_TEXT}</div></div>`;
+    return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
   }
   const positions = scatterPositions(perStudent, dayIdx);
   const stars = perStudent.map((p, idx) => {
@@ -265,7 +266,7 @@ function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
     }
     return `<div class="star" style="left:${x}%;top:${y}%;"><div class="star-pending"></div></div>`;
   }).join("");
-  return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;">${stars}<div class="verse-overlay">${VERSE_TEXT}</div></div>`;
+  return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;">${stars}</div>`;
 }
 
 function ringGauge(percent, size, holeSize, fontSize) {
@@ -341,7 +342,8 @@ function renderStudentScreen(myId) {
   return `
     <div class="eyebrow">PROBE · ${me.name}</div>
     <h1>온라인선교 챌린지</h1>
-    <div class="sub" style="margin-bottom:16px;">2026.09.01 – 2026.10.03 · 총 ${TOTAL_DAYS}일</div>
+    <div class="sub" style="margin-bottom:6px;">2026.09.01 – 2026.10.03 · 총 ${TOTAL_DAYS}일</div>
+    <div class="verse-caption">${VERSE_TEXT}</div>
 
     <div class="card" style="margin-bottom:14px;">
       <div class="panel-head">
@@ -507,7 +509,8 @@ function renderAdminScreen() {
   return `
     <div class="eyebrow">MISSION CONTROL</div>
     <h1>온라인선교 챌린지 관리</h1>
-    <div class="sub" style="margin-bottom:16px;">2026.09.01 – 2026.10.03 · ${d.isActiveToday ? "DAY " + (d.idx + 1) + " / " + TOTAL_DAYS + " 진행 중" : (d.idx < 0 ? "시작 전" : "종료")}</div>
+    <div class="sub" style="margin-bottom:6px;">2026.09.01 – 2026.10.03 · ${d.isActiveToday ? "DAY " + (d.idx + 1) + " / " + TOTAL_DAYS + " 진행 중" : (d.idx < 0 ? "시작 전" : "종료")}</div>
+    <div class="verse-caption">${VERSE_TEXT}</div>
 
     <div class="stat-grid" style="margin-bottom:14px;">${statTiles}</div>
 
@@ -587,7 +590,7 @@ function render() {
   const bg = `<div class="starfield-bg"></div>`;
 
   if (!state.loaded) {
-    app.innerHTML = bg + `<div class="empty-notice">불러오는 중...<div class="verse-line">${VERSE_TEXT}</div></div>`;
+    app.innerHTML = bg + `<div class="empty-notice">불러오는 중...<div class="verse-line">${VERSE_TEXT_2LINE}</div></div>`;
     return;
   }
   if (state.loaded === "error") {
