@@ -6,7 +6,7 @@ React + Firebase 구조로 리팩토링했습니다.
 ## 스택
 
 - [Vite](https://vitejs.dev/) + React 19 + [React Router](https://reactrouter.com/)
-- [Firebase](https://firebase.google.com/) — Firestore(카드 저장), Storage(프로필 사진), Hosting(배포)
+- [Firebase](https://firebase.google.com/) — Firestore(카드 저장, 프로필 사진 포함), Hosting(배포)
 
 ## 라우트
 
@@ -30,12 +30,11 @@ src/
   pages/
     Booth.jsx                 "/" 부스 발급 플로우 페이지
     CardView.jsx               "/card/:id" 공개 프로필 조회 페이지
-  lib/firebase.js            Firebase 앱/Firestore/Storage 초기화
+  lib/firebase.js            Firebase 앱/Firestore 초기화
   App.jsx                    라우트 정의
   App.css                    원본 디자인 시스템(CSS 변수, 레이아웃) 이식
-firebase.json                Hosting/Firestore/Storage 배포 설정 (SPA rewrite 포함)
+firebase.json                Hosting/Firestore 배포 설정 (SPA rewrite 포함)
 firestore.rules             Firestore 보안 규칙
-storage.rules                Storage 보안 규칙
 ```
 
 ## 시작하기
@@ -51,7 +50,6 @@ cp .env.example .env
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
@@ -65,16 +63,18 @@ npm run lint     # oxlint
 ## Firebase 설정
 
 - **Firestore**: `cards` 컬렉션에 발급된 프로필 카드를 저장합니다 (`id`, `template`, `name`,
-  `org`, `role`, `intro`, `contact`, `links`, `portfolio`, `photoURL`, `createdAt`). `/card/:id`
+  `org`, `role`, `intro`, `contact`, `links`, `portfolio`, `photo`, `createdAt`). `/card/:id`
   페이지는 이 문서를 문서 ID로 직접 조회합니다.
-- **Storage**: 업로드한 프로필 사진을 `cards/{id}.jpg` 경로에 저장하고, 다운로드 URL을 Firestore
-  문서에 함께 기록합니다.
+- **사진**: Storage 없이, 업로드한 사진을 브라우저에서 최대 320px로 리사이즈·압축한 뒤 base64
+  문자열(`photo` 필드)로 Firestore 문서에 함께 저장합니다. Firebase Storage는 Blaze(종량제)
+  요금제가 있어야 활성화되는데, Firestore만으로도 이 앱 규모(작은 프로필 사진)에는 충분하고
+  무료 요금제(Spark)로 계속 운영할 수 있습니다. (Firestore 문서 필드는 최대 1MiB까지 저장 가능.)
 - 오프라인이거나 Firebase 프로젝트가 연결되지 않은 경우, 저장 요청은 6초 후 타임아웃되며
   화면은 "데모 모드로 진행 중" 상태로 계속 진행됩니다 — 부스 운영 중 네트워크 문제로 흐름이
   멈추지 않도록 하기 위함입니다. (이 경우 `/card/:id`는 실제로 존재하지 않으므로 접속 시
   "존재하지 않는 프로필입니다"가 표시됩니다.)
-- `firestore.rules`, `storage.rules`는 전시 데모용 오픈 규칙(읽기 전체 허용, 생성만 허용,
-  수정/삭제 불가)입니다. 실제 운영 전에는 인증 기반 규칙으로 교체하세요.
+- `firestore.rules`는 전시 데모용 오픈 규칙(읽기 전체 허용, 생성만 허용, 수정/삭제 불가)입니다.
+  실제 운영 전에는 인증 기반 규칙으로 교체하세요.
 
 ### 배포 (Firebase Hosting)
 
@@ -93,7 +93,8 @@ firebase deploy
 
 - 바닐라 JS DOM 조작 → React 컴포넌트/Context 상태 관리로 전환
 - `window.storage.set/list` 목업 저장소 → Firebase Firestore `setDoc` / `getCountFromServer`
-- 사진 업로드 → Firebase Storage 업로드 + 다운로드 URL 저장 (Firestore에는 URL만 기록)
+- 사진 업로드 → 브라우저에서 리사이즈·압축 후 base64로 Firestore 문서에 직접 저장 (Storage 불필요,
+  무료 요금제로 운영 가능)
 - 발급 시 생성되던 가짜 URL 문자열 → 실제 `/card/:id` 라우트로 연결되어 카드를 조회할 수 있는
   공개 페이지 추가
 - 디자인(CSS 변수, 폰트, 레이아웃)은 원본 그대로 유지

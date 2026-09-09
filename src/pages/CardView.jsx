@@ -61,7 +61,7 @@ export default function CardView() {
         {status === 'ready' && card && (
           <Badge
             tag={TEMPLATE_COPY[card.template]?.tag}
-            photoSrc={card.photoURL}
+            photoSrc={card.photo}
             name={card.name}
             role={[card.org, card.role].filter(Boolean).join(' · ')}
             intro={card.intro}

@@ -1,7 +1,6 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import { collection, doc, getCountFromServer, setDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadString } from 'firebase/storage';
-import { db, storage } from '../lib/firebase';
+import { db } from '../lib/firebase';
 
 const CardContext = createContext(null);
 
@@ -101,7 +100,30 @@ export function CardProvider({ children }) {
   const handlePhotoFile = useCallback((file) => {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setPhotoPreview(ev.target.result);
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSize = 320;
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          }
+        } else if (height > maxSize) {
+          width = Math.round((width * maxSize) / height);
+          height = maxSize;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        // Photos are stored inline on the Firestore card document (no Storage
+        // bucket needed), so keep them well under Firestore's 1MiB field limit.
+        setPhotoPreview(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = ev.target.result;
+    };
     reader.readAsDataURL(file);
   }, []);
 
@@ -134,14 +156,9 @@ export function CardProvider({ children }) {
       portfolio: portfolio.filter((p) => p.title),
       createdAt: Date.now(),
     };
+    if (photoPreview) record.photo = photoPreview;
 
     try {
-      if (photoPreview) {
-        const photoRef = ref(storage, `cards/${id}.jpg`);
-        await withTimeout(uploadString(photoRef, photoPreview, 'data_url'), SAVE_TIMEOUT_MS);
-        record.photoURL = await withTimeout(getDownloadURL(photoRef), SAVE_TIMEOUT_MS);
-      }
-
       await withTimeout(setDoc(doc(collection(db, 'cards'), id), record), SAVE_TIMEOUT_MS);
 
       try {
@@ -157,7 +174,7 @@ export function CardProvider({ children }) {
     }
 
     const url = `${window.location.origin}/card/${id}`;
-    setIssuedCard({ id, url, photoURL: record.photoURL || photoPreview });
+    setIssuedCard({ id, url });
     setIssuing(false);
     goStep(4);
   }, [template, fields, links, portfolio, photoPreview, goStep]);
