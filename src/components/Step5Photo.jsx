@@ -1,13 +1,13 @@
 import { useRef } from 'react';
 import { useCard } from '../context/CardContext';
 
-export default function Step3Photo() {
+export default function Step5Photo() {
   const { step, photoPreview, handlePhotoFile, consent, setConsent, issuing, issueCard, goStep } =
     useCard();
   const fileInputRef = useRef(null);
 
   return (
-    <div className={`panel${step === 3 ? ' active' : ''}`}>
+    <div className={`panel${step === 5 ? ' active' : ''}`}>
       <label>프로필 사진</label>
       <div className="photo-drop" onClick={() => fileInputRef.current?.click()}>
         {photoPreview ? (
@@ -50,7 +50,7 @@ export default function Step3Photo() {
       </div>
 
       <div className="nav-row">
-        <button className="ghost" onClick={() => goStep(2)}>
+        <button className="ghost" onClick={() => goStep(4)}>
           이전
         </button>
         <button className="primary" disabled={!consent || issuing} onClick={issueCard}>

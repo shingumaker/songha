@@ -44,8 +44,12 @@ button {
 }
 .app.card-page {
   grid-template-columns: 1fr;
-  max-width: 380px;
+  max-width: 760px;
+  width: 100%;
   justify-items: center;
+}
+.app.card-page .preview-wrap {
+  width: 100%;
 }
 .eyebrow {
   font-family: 'IBM Plex Mono', monospace;

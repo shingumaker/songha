@@ -25,8 +25,25 @@ const TEMPLATE_COPY = {
   },
 };
 
+const STYLE_META = {
+  colorful: { label: '컬러 카드형', hint: '따뜻한 색감의 스케치 아이콘 카드' },
+  minimal: { label: '미니멀 레주메형', hint: '흑백, 깔끔한 섹션 구분' },
+  gamestat: { label: '게임 스탯형', hint: '다크 테마, 능력치 바 + 퀘스트' },
+  scrapbook: { label: '스크랩북형', hint: '워시테이프와 손글씨 메모' },
+  sparkle: { label: '글로시 스파클형', hint: '파스텔 그라디언트 + 별 장식' },
+  browser: { label: '브라우저 창형', hint: '겹쳐진 앱 창 콜라주' },
+  vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
+  neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
+};
+
+const STYLE_KEYS = Object.keys(STYLE_META);
+
 function randomId() {
   return Math.random().toString(36).slice(2, 8);
+}
+
+function pickRandomStyle() {
+  return STYLE_KEYS[Math.floor(Math.random() * STYLE_KEYS.length)];
 }
 
 const SAVE_TIMEOUT_MS = 6000;
@@ -52,6 +69,9 @@ export function CardProvider({ children }) {
   const [fields, setFields] = useState(initialFields);
   const [links, setLinks] = useState(['']);
   const [portfolio, setPortfolio] = useState([]);
+  const [personality, setPersonality] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [style, setStyle] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [consent, setConsent] = useState(false);
   const [issuing, setIssuing] = useState(false);
@@ -97,6 +117,34 @@ export function CardProvider({ children }) {
     setPortfolio((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
+  const addPersonalityItem = useCallback(() => {
+    setPersonality((prev) => (prev.length >= 3 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updatePersonalityItem = useCallback((idx, key, value) => {
+    setPersonality((prev) => prev.map((p, i) => (i === idx ? { ...p, [key]: value } : p)));
+  }, []);
+
+  const removePersonalityItem = useCallback((idx) => {
+    setPersonality((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const addFavoriteItem = useCallback(() => {
+    setFavorites((prev) => (prev.length >= 4 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updateFavoriteItem = useCallback((idx, key, value) => {
+    setFavorites((prev) => prev.map((f, i) => (i === idx ? { ...f, [key]: value } : f)));
+  }, []);
+
+  const removeFavoriteItem = useCallback((idx) => {
+    setFavorites((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const selectStyle = useCallback((s) => {
+    setStyle(s === 'random' ? pickRandomStyle() : s);
+  }, []);
+
   const handlePhotoFile = useCallback((file) => {
     if (!file) return;
     const reader = new FileReader();
@@ -133,6 +181,9 @@ export function CardProvider({ children }) {
     setFields(initialFields);
     setLinks(['']);
     setPortfolio([]);
+    setPersonality([]);
+    setFavorites([]);
+    setStyle(null);
     setPhotoPreview(null);
     setConsent(false);
     setStatusLine('');
@@ -143,10 +194,12 @@ export function CardProvider({ children }) {
     setIssuing(true);
     setStatusLine('카드 저장 중...');
     const id = randomId();
+    const finalStyle = style || pickRandomStyle();
 
     const record = {
       id,
       template,
+      style: finalStyle,
       name: fields.name.trim(),
       org: fields.org.trim(),
       role: fields.role.trim(),
@@ -154,6 +207,8 @@ export function CardProvider({ children }) {
       contact: fields.contact.trim(),
       links: links.filter((l) => l && l.trim()),
       portfolio: portfolio.filter((p) => p.title),
+      personality: personality.filter((p) => p.title),
+      favorites: favorites.filter((f) => f.title),
       createdAt: Date.now(),
     };
     if (photoPreview) record.photo = photoPreview;
@@ -176,8 +231,8 @@ export function CardProvider({ children }) {
     const url = `${window.location.origin}/card/${id}`;
     setIssuedCard({ id, url });
     setIssuing(false);
-    goStep(4);
-  }, [template, fields, links, portfolio, photoPreview, goStep]);
+    goStep(6);
+  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, goStep]);
 
   const value = useMemo(
     () => ({
@@ -196,6 +251,16 @@ export function CardProvider({ children }) {
       addPortfolioItem,
       updatePortfolioItem,
       removePortfolioItem,
+      personality,
+      addPersonalityItem,
+      updatePersonalityItem,
+      removePersonalityItem,
+      favorites,
+      addFavoriteItem,
+      updateFavoriteItem,
+      removeFavoriteItem,
+      style,
+      selectStyle,
       photoPreview,
       handlePhotoFile,
       consent,
@@ -222,6 +287,16 @@ export function CardProvider({ children }) {
       addPortfolioItem,
       updatePortfolioItem,
       removePortfolioItem,
+      personality,
+      addPersonalityItem,
+      updatePersonalityItem,
+      removePersonalityItem,
+      favorites,
+      addFavoriteItem,
+      updateFavoriteItem,
+      removeFavoriteItem,
+      style,
+      selectStyle,
       photoPreview,
       handlePhotoFile,
       consent,
@@ -243,4 +318,4 @@ export function useCard() {
   return ctx;
 }
 
-export { TEMPLATE_COPY };
+export { TEMPLATE_COPY, STYLE_META, STYLE_KEYS };

@@ -2,9 +2,11 @@ import { CardProvider } from '../context/CardContext';
 import Stepper from '../components/Stepper';
 import Step1Template from '../components/Step1Template';
 import Step2Info from '../components/Step2Info';
-import Step3Photo from '../components/Step3Photo';
-import Step4Done from '../components/Step4Done';
-import BadgePreview from '../components/BadgePreview';
+import Step3PersonalityFavorites from '../components/Step3PersonalityFavorites';
+import Step4StyleSelect from '../components/Step4StyleSelect';
+import Step5Photo from '../components/Step5Photo';
+import Step6Done from '../components/Step6Done';
+import LivePreview from '../components/LivePreview';
 
 function BoothFlow() {
   return (
@@ -17,11 +19,13 @@ function BoothFlow() {
 
         <Step1Template />
         <Step2Info />
-        <Step3Photo />
-        <Step4Done />
+        <Step3PersonalityFavorites />
+        <Step4StyleSelect />
+        <Step5Photo />
+        <Step6Done />
       </div>
 
-      <BadgePreview />
+      <LivePreview />
     </div>
   );
 }

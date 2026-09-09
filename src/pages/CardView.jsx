@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import Badge from '../components/Badge';
-import { TEMPLATE_COPY } from '../context/CardContext';
+import InfographicRenderer from '../components/infographics/InfographicRenderer';
 
 export default function CardView() {
   const { id } = useParams();
@@ -38,7 +37,6 @@ export default function CardView() {
     <div className="app card-page">
       <div className="preview-wrap">
         <div className="preview-label">디지털 프로필</div>
-        <div className="lanyard-hole"></div>
 
         {status === 'loading' && <div className="status-line">불러오는 중...</div>}
 
@@ -58,18 +56,7 @@ export default function CardView() {
           </div>
         )}
 
-        {status === 'ready' && card && (
-          <Badge
-            tag={TEMPLATE_COPY[card.template]?.tag}
-            photoSrc={card.photo}
-            name={card.name}
-            role={[card.org, card.role].filter(Boolean).join(' · ')}
-            intro={card.intro}
-            links={card.links || []}
-            portfolio={card.template === 'portfolio' ? card.portfolio || [] : []}
-            cardId={card.id}
-          />
-        )}
+        {status === 'ready' && card && <InfographicRenderer card={card} />}
 
         <Link className="back-link" to="/">
           새 프로필 만들기 →
