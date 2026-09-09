@@ -46,7 +46,7 @@ function pickRandomStyle() {
   return STYLE_KEYS[Math.floor(Math.random() * STYLE_KEYS.length)];
 }
 
-const SAVE_TIMEOUT_MS = 6000;
+const SAVE_TIMEOUT_MS = 15000;
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -224,7 +224,8 @@ export function CardProvider({ children }) {
       }
 
       setStatusLine('저장 완료');
-    } catch {
+    } catch (err) {
+      console.error('카드 저장 실패:', err);
       setStatusLine('데모 모드로 진행 중 (저장 없이 미리보기만 제공)');
     }
 
