@@ -4,6 +4,15 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import InfographicRenderer from '../components/infographics/InfographicRenderer';
 
+const LOAD_TIMEOUT_MS = 15000;
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+  ]);
+}
+
 export default function CardView() {
   const { id } = useParams();
   const [status, setStatus] = useState('loading');
@@ -14,7 +23,7 @@ export default function CardView() {
     setStatus('loading');
     setCard(null);
 
-    getDoc(doc(db, 'cards', id))
+    withTimeout(getDoc(doc(db, 'cards', id)), LOAD_TIMEOUT_MS)
       .then((snap) => {
         if (cancelled) return;
         if (snap.exists()) {
@@ -24,7 +33,8 @@ export default function CardView() {
           setStatus('not-found');
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('카드 조회 실패:', err);
         if (!cancelled) setStatus('error');
       });
 
