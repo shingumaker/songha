@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,5 +11,9 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+// Some networks (school/venue wifi, firewalls, some browser privacy
+// extensions) break Firestore's default streaming connection instead of
+// failing it fast, so requests just hang. Auto-detecting long polling falls
+// back to plain HTTP requests when that happens.
+export const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 export default app;
