@@ -1,3 +1,5 @@
+import PersonIcon from './infographics/PersonIcon';
+
 export default function Badge({ tag, photoSrc, name, role, intro, links = [], portfolio = [], cardId }) {
   return (
     <div className="badge">
@@ -9,7 +11,7 @@ export default function Badge({ tag, photoSrc, name, role, intro, links = [], po
         </div>
         <div className="badge-tag">{tag || 'TYPE'}</div>
       </div>
-      <div className="badge-photo">{photoSrc ? <img src={photoSrc} alt="프로필" /> : '사진'}</div>
+      <div className="badge-photo">{photoSrc ? <img src={photoSrc} alt="프로필" /> : <PersonIcon color="#a39d87" />}</div>
       <div className="badge-name">{name || '이름을 입력하세요'}</div>
       <div className="badge-role">{role}</div>
       <div className="badge-intro">{intro}</div>

@@ -1,3 +1,5 @@
+import PersonIcon from './PersonIcon';
+
 export default function SparkleInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
@@ -22,8 +24,8 @@ export default function SparkleInfographic({ card }) {
         {photo ? (
           <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 30, color: '#241c4a' }}>
-            {(name || '?').slice(0, 1)}
+          <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <PersonIcon color="#241c4a" />
           </div>
         )}
       </div>

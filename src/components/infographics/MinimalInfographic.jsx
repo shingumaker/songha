@@ -1,3 +1,5 @@
+import PersonIcon from './PersonIcon';
+
 export default function MinimalInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
@@ -8,8 +10,8 @@ export default function MinimalInfographic({ card }) {
         PROFILE
       </div>
       <div style={{ borderTop: '2px solid #1a1a1a', paddingTop: 22, display: 'flex', gap: 26, flexWrap: 'wrap' }}>
-        <div style={{ width: 118, height: 118, background: '#f0f0f0', flexShrink: 0, overflow: 'hidden' }}>
-          {photo && <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+        <div style={{ width: 118, height: 118, background: '#f0f0f0', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {photo ? <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <PersonIcon color="#b0b0b0" />}
         </div>
         <div style={{ flex: 1, minWidth: 200 }}>
           <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 34, color: '#1a1a1a', lineHeight: 1 }}>

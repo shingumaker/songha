@@ -1,3 +1,5 @@
+import PersonIcon from './PersonIcon';
+
 export default function NeonInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
@@ -32,9 +34,7 @@ export default function NeonInfographic({ card }) {
             {photo ? (
               <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 26, color: '#7ef9ff', ...glow }}>
-                {(name || '?').slice(0, 1)}
-              </span>
+              <PersonIcon color="#7ef9ff" />
             )}
           </div>
         </div>

@@ -1,3 +1,5 @@
+import PersonIcon from './PersonIcon';
+
 export default function GameStatInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
@@ -28,8 +30,8 @@ export default function GameStatInfographic({ card }) {
         </div>
 
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          <div style={{ width: 84, height: 84, borderRadius: 16, background: '#12162a', border: '2px solid #4ee6c8', flexShrink: 0, overflow: 'hidden' }}>
-            {photo && <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+          <div style={{ width: 84, height: 84, borderRadius: 16, background: '#12162a', border: '2px solid #4ee6c8', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {photo ? <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <PersonIcon color="#4ee6c8" />}
           </div>
           <div>
             <div style={{ display: 'inline-block', background: '#ff6fa5', color: '#12162a', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 10, padding: '2px 9px', borderRadius: 6, marginBottom: 6 }}>

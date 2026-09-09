@@ -1,3 +1,5 @@
+import PersonIcon from './PersonIcon';
+
 export default function ScrapbookInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
@@ -7,8 +9,8 @@ export default function ScrapbookInfographic({ card }) {
       <Tape align="flex-start" indent={40} rotate={-8} color="rgba(232,103,44,0.35)" width={90} />
       <Note rotate={-1.2}>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          <div style={{ width: 70, height: 70, background: '#f0ece0', border: '2px solid #2c2a22', flexShrink: 0, transform: 'rotate(-2deg)', overflow: 'hidden' }}>
-            {photo && <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+          <div style={{ width: 70, height: 70, background: '#f0ece0', border: '2px solid #2c2a22', flexShrink: 0, transform: 'rotate(-2deg)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {photo ? <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <PersonIcon color="#8a8470" />}
           </div>
           <div>
             <div style={{ fontFamily: "'Caveat',cursive", fontWeight: 700, fontSize: 34, color: '#2c2a22', lineHeight: 1 }}>{name}</div>

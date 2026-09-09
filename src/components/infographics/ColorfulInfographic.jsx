@@ -1,4 +1,5 @@
 import { darken, lighten } from './colorUtils';
+import PersonIcon from './PersonIcon';
 
 const ACCENT = '#e8672c';
 
@@ -6,7 +7,6 @@ export default function ColorfulInfographic({ card }) {
   const accentDark = darken(ACCENT, 0.72);
   const accentSoft = lighten(ACCENT, 0.86);
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
-  const initial = (name || '?').slice(0, 1);
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
   const hasLink = links?.length > 0;
 
@@ -39,9 +39,7 @@ export default function ColorfulInfographic({ card }) {
             {photo ? (
               <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 34, color: '#fff' }}>
-                {initial}
-              </span>
+              <PersonIcon color="#fff" />
             )}
           </div>
 

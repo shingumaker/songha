@@ -1,3 +1,5 @@
+import PersonIcon from './PersonIcon';
+
 export default function VintageInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
@@ -23,8 +25,8 @@ export default function VintageInfographic({ card }) {
         </div>
 
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          <div style={{ width: 88, height: 104, background: '#d8cfae', border: '1.5px solid #6b5a3a', flexShrink: 0, overflow: 'hidden' }}>
-            {photo && <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+          <div style={{ width: 88, height: 104, background: '#d8cfae', border: '1.5px solid #6b5a3a', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {photo ? <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <PersonIcon color="#6b5a3a" />}
           </div>
           <div style={{ flex: 1, minWidth: 180, fontSize: 11, color: '#4a3d28', lineHeight: 2 }}>
             <div><span style={{ color: '#8a7a52' }}>Name</span> &middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot; {name}</div>
