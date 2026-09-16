@@ -12,8 +12,8 @@ const firebaseConfig = {
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 // Some networks (school/venue wifi, firewalls, some browser privacy
-// extensions) break Firestore's default streaming connection instead of
-// failing it fast, so requests just hang. Auto-detecting long polling falls
-// back to plain HTTP requests when that happens.
-export const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+// extensions) don't fail Firestore's default streaming connection fast
+// enough to trigger auto-detection - they just let it hang. Forcing plain
+// HTTP long polling skips that detection step entirely.
+export const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 export default app;
