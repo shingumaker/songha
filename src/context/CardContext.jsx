@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
-import { collection, doc, getCountFromServer, setDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore/lite';
 import { db } from '../lib/firebase';
 
 const CardContext = createContext(null);
@@ -77,7 +77,6 @@ export function CardProvider({ children }) {
   const [issuing, setIssuing] = useState(false);
   const [statusLine, setStatusLine] = useState('');
   const [issuedCard, setIssuedCard] = useState(null);
-  const [galleryCount, setGalleryCount] = useState(null);
 
   const selectTemplate = useCallback((t) => {
     setTemplate(t);
@@ -215,14 +214,6 @@ export function CardProvider({ children }) {
 
     try {
       await withTimeout(setDoc(doc(collection(db, 'cards'), id), record), SAVE_TIMEOUT_MS);
-
-      try {
-        const snap = await withTimeout(getCountFromServer(collection(db, 'cards')), SAVE_TIMEOUT_MS);
-        setGalleryCount(snap.data().count);
-      } catch {
-        // count is a nice-to-have; ignore failures
-      }
-
       setStatusLine('저장 완료');
     } catch (err) {
       console.error('카드 저장 실패:', err);
@@ -269,7 +260,6 @@ export function CardProvider({ children }) {
       issuing,
       statusLine,
       issuedCard,
-      galleryCount,
       issueCard,
       resetFlow,
     }),
@@ -304,7 +294,6 @@ export function CardProvider({ children }) {
       issuing,
       statusLine,
       issuedCard,
-      galleryCount,
       issueCard,
       resetFlow,
     ],

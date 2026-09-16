@@ -2,8 +2,7 @@ import { useCard } from '../context/CardContext';
 import Badge from './Badge';
 
 export default function BadgePreview() {
-  const { template, templateCopy, fields, links, portfolio, photoPreview, statusLine, issuedCard, galleryCount } =
-    useCard();
+  const { template, templateCopy, fields, links, portfolio, photoPreview, statusLine, issuedCard } = useCard();
 
   const roleLine = [fields.org.trim(), fields.role.trim()].filter(Boolean).join(' · ');
   const visibleLinks = links.filter((l) => l && l.trim());
@@ -29,9 +28,6 @@ export default function BadgePreview() {
         </div>
       )}
       <div className="status-line">{statusLine}</div>
-      <div className="gallery-count">
-        {galleryCount !== null ? `지금까지 발급된 프로필: ${galleryCount}개` : ''}
-      </div>
     </div>
   );
 }

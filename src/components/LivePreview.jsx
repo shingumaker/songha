@@ -15,7 +15,6 @@ export default function LivePreview() {
     photoPreview,
     issuedCard,
     statusLine,
-    galleryCount,
   } = useCard();
 
   if (step < 4 || !style) {
@@ -43,9 +42,6 @@ export default function LivePreview() {
       <InfographicRenderer card={card} />
       {issuedCard && <div className="url-box">{issuedCard.url}</div>}
       <div className="status-line">{statusLine}</div>
-      <div className="gallery-count">
-        {galleryCount !== null ? `지금까지 발급된 프로필: ${galleryCount}개` : ''}
-      </div>
     </div>
   );
 }

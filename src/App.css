@@ -499,13 +499,6 @@ textarea {
   margin-top: 10px;
   text-align: center;
 }
-.gallery-count {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  color: var(--slate);
-  margin-top: 18px;
-  text-align: center;
-}
 
 .done-screen {
   text-align: center;
