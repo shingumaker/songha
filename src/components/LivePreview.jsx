@@ -13,6 +13,7 @@ export default function LivePreview() {
     personality,
     favorites,
     photoPreview,
+    avatarIcon,
     issuedCard,
     statusLine,
   } = useCard();
@@ -33,6 +34,7 @@ export default function LivePreview() {
     personality: personality.filter((p) => p.title),
     favorites: favorites.filter((f) => f.title),
     photo: photoPreview,
+    avatarIcon,
     id: issuedCard?.id,
   };
 

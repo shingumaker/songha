@@ -6,6 +6,7 @@ import SparkleInfographic from './SparkleInfographic';
 import BrowserInfographic from './BrowserInfographic';
 import VintageInfographic from './VintageInfographic';
 import NeonInfographic from './NeonInfographic';
+import RepublicInfographic from './RepublicInfographic';
 
 const RENDERERS = {
   colorful: ColorfulInfographic,
@@ -16,6 +17,7 @@ const RENDERERS = {
   browser: BrowserInfographic,
   vintage: VintageInfographic,
   neon: NeonInfographic,
+  republic: RepublicInfographic,
 };
 
 export default function InfographicRenderer({ card }) {

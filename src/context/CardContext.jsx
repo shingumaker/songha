@@ -34,9 +34,12 @@ const STYLE_META = {
   browser: { label: '브라우저 창형', hint: '겹쳐진 앱 창 콜라주' },
   vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
   neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
+  republic: { label: '공화국 신분증형', hint: '가상국가 여권/신분증 콘셉트' },
 };
 
 const STYLE_KEYS = Object.keys(STYLE_META);
+
+const AVATAR_ICONS = ['🚀', '🎨', '🧠', '⚡', '🌱', '🎯', '🦄', '🐝'];
 
 function randomId() {
   return Math.random().toString(36).slice(2, 8);
@@ -73,6 +76,7 @@ export function CardProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
   const [style, setStyle] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [avatarIcon, setAvatarIcon] = useState(null);
   const [consent, setConsent] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [statusLine, setStatusLine] = useState('');
@@ -146,6 +150,7 @@ export function CardProvider({ children }) {
 
   const handlePhotoFile = useCallback((file) => {
     if (!file) return;
+    setAvatarIcon(null);
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
@@ -174,6 +179,11 @@ export function CardProvider({ children }) {
     reader.readAsDataURL(file);
   }, []);
 
+  const selectAvatarIcon = useCallback((icon) => {
+    setPhotoPreview(null);
+    setAvatarIcon(icon);
+  }, []);
+
   const resetFlow = useCallback(() => {
     setStep(1);
     setTemplate(null);
@@ -184,6 +194,7 @@ export function CardProvider({ children }) {
     setFavorites([]);
     setStyle(null);
     setPhotoPreview(null);
+    setAvatarIcon(null);
     setConsent(false);
     setStatusLine('');
     setIssuedCard(null);
@@ -211,6 +222,7 @@ export function CardProvider({ children }) {
       createdAt: Date.now(),
     };
     if (photoPreview) record.photo = photoPreview;
+    else if (avatarIcon) record.avatarIcon = avatarIcon;
 
     try {
       await withTimeout(setDoc(doc(collection(db, 'cards'), id), record), SAVE_TIMEOUT_MS);
@@ -224,7 +236,7 @@ export function CardProvider({ children }) {
     setIssuedCard({ id, url });
     setIssuing(false);
     goStep(6);
-  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, goStep]);
+  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep]);
 
   const value = useMemo(
     () => ({
@@ -255,6 +267,9 @@ export function CardProvider({ children }) {
       selectStyle,
       photoPreview,
       handlePhotoFile,
+      avatarIcon,
+      selectAvatarIcon,
+      avatarIconOptions: AVATAR_ICONS,
       consent,
       setConsent,
       issuing,
@@ -290,6 +305,8 @@ export function CardProvider({ children }) {
       selectStyle,
       photoPreview,
       handlePhotoFile,
+      avatarIcon,
+      selectAvatarIcon,
       consent,
       issuing,
       statusLine,

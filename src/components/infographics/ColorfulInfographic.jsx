@@ -1,12 +1,12 @@
 import { darken, lighten } from './colorUtils';
-import PersonIcon from './PersonIcon';
+import AvatarDisplay from './AvatarDisplay';
 
 const ACCENT = '#e8672c';
 
 export default function ColorfulInfographic({ card }) {
   const accentDark = darken(ACCENT, 0.72);
   const accentSoft = lighten(ACCENT, 0.86);
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
   const hasLink = links?.length > 0;
 
@@ -36,11 +36,7 @@ export default function ColorfulInfographic({ card }) {
               overflow: 'hidden',
             }}
           >
-            {photo ? (
-              <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <PersonIcon color="#fff" />
-            )}
+            <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={88} color="#fff" />
           </div>
 
           <div style={{ flex: 1, minWidth: 200 }}>

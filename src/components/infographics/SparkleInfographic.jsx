@@ -1,7 +1,7 @@
-import PersonIcon from './PersonIcon';
+import AvatarDisplay from './AvatarDisplay';
 
 export default function SparkleInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -20,14 +20,8 @@ export default function SparkleInfographic({ card }) {
       <Star top={60} right={20} size={16} />
       <Star bottom={40} left={0} size={20} opacity={0.6} />
 
-      <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', marginBottom: 14, border: '2px solid #241c4a' }}>
-        {photo ? (
-          <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : (
-          <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <PersonIcon color="#241c4a" />
-          </div>
-        )}
+      <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', marginBottom: 14, border: '2px solid #241c4a', background: '#fff' }}>
+        <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={80} color="#241c4a" />
       </div>
 
       <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 44, color: '#241c4a', letterSpacing: '-0.01em', lineHeight: 0.95 }}>

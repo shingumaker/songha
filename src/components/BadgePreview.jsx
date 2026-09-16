@@ -2,7 +2,8 @@ import { useCard } from '../context/CardContext';
 import Badge from './Badge';
 
 export default function BadgePreview() {
-  const { template, templateCopy, fields, links, portfolio, photoPreview, statusLine, issuedCard } = useCard();
+  const { template, templateCopy, fields, links, portfolio, photoPreview, avatarIcon, statusLine, issuedCard } =
+    useCard();
 
   const roleLine = [fields.org.trim(), fields.role.trim()].filter(Boolean).join(' · ');
   const visibleLinks = links.filter((l) => l && l.trim());
@@ -15,6 +16,7 @@ export default function BadgePreview() {
       <Badge
         tag={templateCopy?.tag}
         photoSrc={photoPreview}
+        avatarIcon={avatarIcon}
         name={fields.name.trim()}
         role={roleLine}
         intro={fields.intro.trim()}

@@ -1,15 +1,15 @@
-import PersonIcon from './PersonIcon';
+import AvatarDisplay from './AvatarDisplay';
 
 export default function BrowserInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
     <div style={{ fontFamily: "'Noto Sans KR',sans-serif", width: '100%', background: '#5b6bb8', borderRadius: 20, padding: 24, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 16 }}>
       <Win title="profile.exe">
         <div style={{ padding: '18px 20px', display: 'flex', gap: 16, alignItems: 'center' }}>
-          <div style={{ width: 64, height: 64, background: '#eef0fb', border: '2px solid #241c4a', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {photo ? <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <PersonIcon color="#241c4a" />}
+          <div style={{ width: 64, height: 64, background: '#eef0fb', border: '2px solid #241c4a', flexShrink: 0, overflow: 'hidden' }}>
+            <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={64} color="#241c4a" />
           </div>
           <div>
             <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 24, color: '#241c4a' }}>{name}</div>

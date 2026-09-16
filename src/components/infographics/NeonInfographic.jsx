@@ -1,7 +1,7 @@
-import PersonIcon from './PersonIcon';
+import AvatarDisplay from './AvatarDisplay';
 
 export default function NeonInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
   const glow = { textShadow: '0 0 6px currentColor, 0 0 16px currentColor' };
 
@@ -31,11 +31,7 @@ export default function NeonInfographic({ card }) {
               justifyContent: 'center',
             }}
           >
-            {photo ? (
-              <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <PersonIcon color="#7ef9ff" />
-            )}
+            <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={72} color="#7ef9ff" />
           </div>
         </div>
 
