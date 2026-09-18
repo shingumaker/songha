@@ -37,6 +37,8 @@ const STYLE_META = {
   republic: { label: '공화국 신분증형', hint: '가상국가 여권/신분증 콘셉트' },
   civicpass: { label: '시빅 패스', hint: '그린 그라데이션 배너 + 크레딧카드형 ID' },
   techpass: { label: '테크 패스', hint: '다크 홀로그래픽 액세스 카드' },
+  license: { label: '라이선스형', hint: '별 테두리 + 필기체 서명란의 빈티지 증서' },
+  membership: { label: '멤버십 카드형', hint: '팀 원형 뱃지 + 손글씨 낙서 멤버십 카드' },
 };
 
 const STYLE_KEYS = Object.keys(STYLE_META);

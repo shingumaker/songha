@@ -9,6 +9,8 @@ import NeonInfographic from './NeonInfographic';
 import RepublicInfographic from './RepublicInfographic';
 import CivicPassInfographic from './CivicPassInfographic';
 import TechPassInfographic from './TechPassInfographic';
+import LicenseInfographic from './LicenseInfographic';
+import MembershipInfographic from './MembershipInfographic';
 
 const RENDERERS = {
   colorful: ColorfulInfographic,
@@ -22,6 +24,8 @@ const RENDERERS = {
   republic: RepublicInfographic,
   civicpass: CivicPassInfographic,
   techpass: TechPassInfographic,
+  license: LicenseInfographic,
+  membership: MembershipInfographic,
 };
 
 export default function InfographicRenderer({ card }) {
