@@ -35,6 +35,8 @@ const STYLE_META = {
   vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
   neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
   republic: { label: '공화국 신분증형', hint: '가상국가 여권/신분증 콘셉트' },
+  civicpass: { label: '시빅 패스', hint: '그린 그라데이션 배너 + 크레딧카드형 ID' },
+  techpass: { label: '테크 패스', hint: '다크 홀로그래픽 액세스 카드' },
 };
 
 const STYLE_KEYS = Object.keys(STYLE_META);

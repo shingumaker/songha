@@ -29,7 +29,7 @@ export default function Step4StyleSelect() {
           <div className="n" style={{ fontSize: 13, color: 'var(--lime)' }}>
             🎲 랜덤으로 뽑기
           </div>
-          <div className="d">9가지 중 하나가 무작위로 정해져요.</div>
+          <div className="d">11가지 중 하나가 무작위로 정해져요.</div>
         </div>
       </div>
 
