@@ -25,7 +25,7 @@ const TEMPLATE_COPY = {
   },
 };
 
-const STYLE_META = {
+const PROFILE_STYLE_META = {
   colorful: { label: '컬러 카드형', hint: '따뜻한 색감의 스케치 아이콘 카드' },
   minimal: { label: '미니멀 레주메형', hint: '흑백, 깔끔한 섹션 구분' },
   gamestat: { label: '게임 스탯형', hint: '다크 테마, 능력치 바 + 퀘스트' },
@@ -35,12 +35,19 @@ const STYLE_META = {
   vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
   neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
   republic: { label: '공화국 신분증형', hint: '가상국가 여권/신분증 콘셉트' },
+};
+
+const CARD_STYLE_META = {
   civicpass: { label: '시빅 패스', hint: '그린 그라데이션 배너 + 크레딧카드형 ID' },
   techpass: { label: '테크 패스', hint: '다크 홀로그래픽 액세스 카드' },
   license: { label: '라이선스형', hint: '별 테두리 + 필기체 서명란의 빈티지 증서' },
   membership: { label: '멤버십 카드형', hint: '팀 원형 뱃지 + 손글씨 낙서 멤버십 카드' },
 };
 
+const STYLE_META = { ...PROFILE_STYLE_META, ...CARD_STYLE_META };
+
+const PROFILE_STYLE_KEYS = Object.keys(PROFILE_STYLE_META);
+const CARD_STYLE_KEYS = Object.keys(CARD_STYLE_META);
 const STYLE_KEYS = Object.keys(STYLE_META);
 
 const AVATAR_ICONS = ['🚀', '🎨', '🧠', '⚡', '🌱', '🎯', '🦄', '🐝'];
@@ -49,8 +56,8 @@ function randomId() {
   return Math.random().toString(36).slice(2, 8);
 }
 
-function pickRandomStyle() {
-  return STYLE_KEYS[Math.floor(Math.random() * STYLE_KEYS.length)];
+function pickRandomStyle(keys) {
+  return keys[Math.floor(Math.random() * keys.length)];
 }
 
 const SAVE_TIMEOUT_MS = 15000;
@@ -70,7 +77,8 @@ const initialFields = {
   contact: '',
 };
 
-export function CardProvider({ children }) {
+export function CardProvider({ children, mode = 'profile' }) {
+  const styleKeys = mode === 'card' ? CARD_STYLE_KEYS : PROFILE_STYLE_KEYS;
   const [step, setStep] = useState(1);
   const [template, setTemplate] = useState(null);
   const [fields, setFields] = useState(initialFields);
@@ -149,8 +157,8 @@ export function CardProvider({ children }) {
   }, []);
 
   const selectStyle = useCallback((s) => {
-    setStyle(s === 'random' ? pickRandomStyle() : s);
-  }, []);
+    setStyle(s === 'random' ? pickRandomStyle(styleKeys) : s);
+  }, [styleKeys]);
 
   const handlePhotoFile = useCallback((file) => {
     if (!file) return;
@@ -208,7 +216,7 @@ export function CardProvider({ children }) {
     setIssuing(true);
     setStatusLine('카드 저장 중...');
     const id = randomId();
-    const finalStyle = style || pickRandomStyle();
+    const finalStyle = style || pickRandomStyle(styleKeys);
 
     const record = {
       id,
@@ -240,12 +248,13 @@ export function CardProvider({ children }) {
     setIssuedCard({ id, url });
     setIssuing(false);
     goStep(6);
-  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep]);
+  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys]);
 
   const value = useMemo(
     () => ({
       step,
       goStep,
+      styleKeys,
       template,
       selectTemplate,
       templateCopy: template ? TEMPLATE_COPY[template] : null,
@@ -285,6 +294,7 @@ export function CardProvider({ children }) {
     [
       step,
       goStep,
+      styleKeys,
       template,
       selectTemplate,
       fields,
@@ -329,4 +339,4 @@ export function useCard() {
   return ctx;
 }
 
-export { TEMPLATE_COPY, STYLE_META, STYLE_KEYS };
+export { TEMPLATE_COPY, STYLE_META, STYLE_KEYS, PROFILE_STYLE_KEYS, CARD_STYLE_KEYS };
