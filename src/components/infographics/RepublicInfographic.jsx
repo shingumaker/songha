@@ -1,7 +1,12 @@
 import AvatarDisplay from './AvatarDisplay';
 
-const GUILLOCHE_BG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30 Q15 10 30 30 T60 30' stroke='%23c8102e0d' fill='none' stroke-width='1'/%3E%3Cpath d='M0 15 Q15 -5 30 15 T60 15' stroke='%23122b5e0d' fill='none' stroke-width='1'/%3E%3Cpath d='M0 45 Q15 25 30 45 T60 45' stroke='%23122b5e0d' fill='none' stroke-width='1'/%3E%3C/svg%3E";
+const WATERMARK_BG =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Ccircle cx='45' cy='45' r='38' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.35'/%3E%3Ccircle cx='45' cy='45' r='26' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.35'/%3E%3C/svg%3E";
+
+function formatIdNumber(id) {
+  const base = (id || 'guest0').toUpperCase().padEnd(12, '0').repeat(2).slice(0, 12);
+  return base.match(/.{1,4}/g).join('  ');
+}
 
 export default function RepublicInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
@@ -9,119 +14,156 @@ export default function RepublicInfographic({ card }) {
 
   return (
     <div style={{ fontFamily: "'Noto Sans KR',sans-serif", width: '100%' }}>
+      {/* front face: card-shaped ID */}
       <div
         style={{
-          background: `#f7f3e8 url("${GUILLOCHE_BG}")`,
-          border: '2px solid #122b5e',
-          borderRadius: 10,
-          padding: '22px 24px',
           position: 'relative',
-          boxShadow: '0 16px 40px rgba(18,43,94,0.18)',
+          aspectRatio: '1.6 / 1',
+          borderRadius: 16,
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #dce9f7 0%, #eef2fb 45%, #f7eef5 100%)',
+          boxShadow: '0 18px 40px rgba(30,50,90,0.22)',
+          padding: '16px 18px',
+          boxSizing: 'border-box',
         }}
       >
-        <div style={{ position: 'absolute', inset: 6, border: '1px solid #c8102e', borderRadius: 6, pointerEvents: 'none' }} />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url("${WATERMARK_BG}")`,
+            backgroundSize: '70px 70px',
+            transform: 'rotate(-8deg) scale(1.4)',
+            opacity: 0.6,
+            pointerEvents: 'none',
+          }}
+        />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-          <Emblem />
-          <div>
-            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 15, color: '#122b5e', letterSpacing: '0.04em' }}>
-              REPUBLIC OF CREATIVITY
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div
+            style={{
+              background: '#c8102e',
+              color: '#fff',
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontWeight: 800,
+              fontSize: 10,
+              letterSpacing: '0.04em',
+              padding: '4px 9px',
+              borderRadius: 5,
+            }}
+          >
+            EXPO ID
+          </div>
+          <NfcIcon />
+        </div>
+
+        <div
+          style={{
+            position: 'relative',
+            fontFamily: "'Space Grotesk',sans-serif",
+            fontWeight: 800,
+            fontSize: 13,
+            color: '#122b5e',
+            letterSpacing: '0.02em',
+            marginTop: 8,
+          }}
+        >
+          REPUBLIC OF CREATIVITY
+          <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 8, fontWeight: 400, color: '#6b7a99', letterSpacing: '0.06em', marginTop: 1 }}>
+            창의공화국 · 공식 시민증
+          </div>
+        </div>
+
+        <div style={{ position: 'relative', display: 'flex', gap: 14, alignItems: 'flex-end', marginTop: 10 }}>
+          <div
+            style={{
+              width: 62,
+              height: 76,
+              borderRadius: 6,
+              border: '1.5px solid rgba(18,43,94,0.35)',
+              overflow: 'hidden',
+              flexShrink: 0,
+              background: '#fff',
+            }}
+          >
+            <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={62} color="#122b5e" />
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Chip />
+            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 15, color: '#122b5e', marginTop: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {name}
             </div>
-            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 9, color: '#6b6152', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              창의공화국 · 공식 시민증
+            <div style={{ fontSize: 9, color: '#6b7a99', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {[org, role].filter(Boolean).join(' · ')}
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <div
-              style={{
-                width: 92,
-                height: 108,
-                background: '#e3d9c2',
-                border: '1.5px solid #122b5e',
-                overflow: 'hidden',
-              }}
-            >
-              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={92} color="#122b5e" />
-            </div>
-            <Hologram />
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 10 }}>
+          <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: '#122b5e', letterSpacing: '0.06em' }}>
+            {formatIdNumber(id)}
           </div>
-
-          <div style={{ flex: 1, minWidth: 180, fontSize: 11.5, color: '#2c2a22', lineHeight: 2 }}>
-            <RField label="SURNAME / 성명" value={name} big />
-            <RField label="AFFILIATION / 소속" value={org} />
-            <RField label="TITLE / 직함" value={role} />
-            {id && <RField label="ID NO." value={id.toUpperCase()} mono />}
-          </div>
+          <Wordmark />
         </div>
+      </div>
 
-        {intro && (
-          <div style={{ marginTop: 16, borderTop: '1px dashed #c8102e88', paddingTop: 10, fontSize: 11, color: '#2c2a22', fontStyle: 'italic', lineHeight: 1.6 }}>
-            MOTTO &middot; &ldquo;{intro}&rdquo;
-          </div>
-        )}
-
-        {personality?.length > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <RLabel>DISTINGUISHING FEATURES / 특기사항</RLabel>
-            <div style={{ fontSize: 10.5, color: '#2c2a22', lineHeight: 1.9 }}>
-              {personality.map((p) => p.title).join(' · ')}
+      {/* supplementary info below the card, on its own light panel for contrast */}
+      {(intro || personality?.length > 0 || favorites?.length > 0 || hasPortfolio || links?.length > 0) && (
+        <div
+          style={{
+            marginTop: 16,
+            background: '#f7f3e8',
+            borderRadius: 12,
+            padding: '16px 18px',
+            boxShadow: '0 12px 30px rgba(30,50,90,0.14)',
+          }}
+        >
+          {intro && (
+            <div style={{ fontSize: 11, color: '#2c2a22', fontStyle: 'italic', lineHeight: 1.6, textAlign: 'center' }}>
+              MOTTO &middot; &ldquo;{intro}&rdquo;
             </div>
-          </div>
-        )}
+          )}
 
-        {favorites?.length > 0 && (
-          <div style={{ marginTop: 14 }}>
-            <RLabel>ENDORSEMENTS / 관심 분야</RLabel>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 6 }}>
-              {favorites.map((f, i) => (
-                <Stamp key={i} label={f.title} />
-              ))}
+          {personality?.length > 0 && (
+            <div style={{ marginTop: intro ? 14 : 0 }}>
+              <RLabel>DISTINGUISHING FEATURES / 특기사항</RLabel>
+              <div style={{ fontSize: 10.5, color: '#2c2a22', lineHeight: 1.9 }}>
+                {personality.map((p) => p.title).join(' · ')}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {(hasPortfolio || links?.length > 0) && (
-          <div style={{ marginTop: 14, background: 'rgba(18,43,94,0.06)', border: '1px solid #122b5e33', borderRadius: 4, padding: '10px 12px' }}>
-            <RLabel>ACCESS LOG / {hasPortfolio ? '프로젝트' : '링크'}</RLabel>
-            {hasPortfolio
-              ? portfolio.map((p, i) => (
-                  <div key={i} style={{ fontSize: 11, color: '#122b5e', marginTop: 4 }}>
-                    {p.title}
-                    {p.desc && ` — ${p.desc}`}
-                  </div>
-                ))
-              : links.map((l, i) => (
-                  <div key={i} style={{ fontSize: 11, color: '#122b5e', marginTop: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
-                    {l}
-                  </div>
+          {favorites?.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <RLabel>ENDORSEMENTS / 관심 분야</RLabel>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 6 }}>
+                {favorites.map((f, i) => (
+                  <Stamp key={i} label={f.title} />
                 ))}
-          </div>
-        )}
+              </div>
+            </div>
+          )}
 
-        <div style={{ marginTop: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-          <Barcode />
-          <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 8, color: '#6b6152', textAlign: 'right' }}>
-            ISSUED · REPUBLIC OF CREATIVITY
-            <br />
-            EXPO 2026
-          </div>
+          {(hasPortfolio || links?.length > 0) && (
+            <div style={{ marginTop: 14, background: 'rgba(18,43,94,0.06)', border: '1px solid #122b5e33', borderRadius: 4, padding: '10px 12px' }}>
+              <RLabel>ACCESS LOG / {hasPortfolio ? '프로젝트' : '링크'}</RLabel>
+              {hasPortfolio
+                ? portfolio.map((p, i) => (
+                    <div key={i} style={{ fontSize: 11, color: '#122b5e', marginTop: 4 }}>
+                      {p.title}
+                      {p.desc && ` — ${p.desc}`}
+                    </div>
+                  ))
+                : links.map((l, i) => (
+                    <div key={i} style={{ fontSize: 11, color: '#122b5e', marginTop: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
+                      {l}
+                    </div>
+                  ))}
+            </div>
+          )}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function RField({ label, value, mono, big }) {
-  if (!value) return null;
-  return (
-    <div>
-      <span style={{ color: '#8a7f6c', fontSize: 9, letterSpacing: '0.04em' }}>{label}</span>
-      <div style={{ fontWeight: big ? 700 : 600, fontSize: big ? 16 : 12, fontFamily: mono ? "'IBM Plex Mono',monospace" : undefined }}>
-        {value}
-      </div>
+      )}
     </div>
   );
 }
@@ -134,35 +176,41 @@ function RLabel({ children }) {
   );
 }
 
-function Emblem() {
+function NfcIcon() {
   return (
-    <svg width={30} height={30} viewBox="0 0 32 32" style={{ flexShrink: 0 }}>
-      <circle cx="16" cy="16" r="14" fill="none" stroke="#122b5e" strokeWidth="1.5" />
-      <circle cx="16" cy="16" r="10" fill="none" stroke="#c8102e" strokeWidth="1" />
-      <path d="M16 9l1.8 5.5H23l-4.6 3.4 1.8 5.6-4.2-3.5-4.2 3.5 1.8-5.6L9 14.5h5.2z" fill="#122b5e" />
+    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#122b5e" strokeWidth="2">
+      <path d="M6 8a6 6 0 0 1 0 8M9 5a10 10 0 0 1 0 14M3 11a2 2 0 0 1 0 2" />
     </svg>
   );
 }
 
-function Hologram() {
+function Chip() {
   return (
     <div
       style={{
-        position: 'absolute',
-        bottom: -8,
-        right: -8,
         width: 30,
-        height: 30,
-        borderRadius: '50%',
-        background: 'conic-gradient(from 0deg, #ffd1e8, #c8b8ff, #b8f0ff, #d1ffd6, #ffe9b8, #ffd1e8)',
-        border: '1.5px solid #fff',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        height: 22,
+        borderRadius: 4,
+        background: 'linear-gradient(135deg, #f5d98a, #cf9f4a)',
+        border: '1px solid rgba(0,0,0,0.15)',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <span style={{ fontSize: 11, color: '#122b5eaa' }}>★</span>
+      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'rgba(0,0,0,0.25)' }} />
+      <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: 'rgba(0,0,0,0.25)' }} />
+    </div>
+  );
+}
+
+function Wordmark() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#c8102e', opacity: 0.85 }} />
+      <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#122b5e', opacity: 0.85, marginLeft: -6 }} />
+      <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 11, color: '#122b5e', marginLeft: 5 }}>
+        PASS
+      </span>
     </div>
   );
 }
@@ -184,17 +232,6 @@ function Stamp({ label }) {
       }}
     >
       <span style={{ fontSize: 9, fontWeight: 700, color: '#c8102e', lineHeight: 1.2, padding: '0 4px' }}>{label}</span>
-    </div>
-  );
-}
-
-function Barcode() {
-  const bars = [2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2];
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 1, height: 20 }}>
-      {bars.map((w, i) => (
-        <div key={i} style={{ width: w, height: 18, background: '#122b5e' }} />
-      ))}
     </div>
   );
 }
