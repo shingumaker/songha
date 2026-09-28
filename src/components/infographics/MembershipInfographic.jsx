@@ -37,7 +37,7 @@ export default function MembershipInfographic({ card }) {
         style={{
           aspectRatio: '856 / 540',
           containerType: 'size',
-          borderRadius: cqw(26),
+          borderRadius: 0,
           overflow: 'hidden',
           position: 'relative',
           boxSizing: 'border-box',
