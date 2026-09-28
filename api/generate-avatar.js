@@ -20,6 +20,8 @@ export default async function handler(req, res) {
   const fullPrompt =
     'A realistic photographic headshot portrait, natural lighting, shot on a camera, simple neutral background, ' +
     'single person centered, head-and-shoulders, high detail, no text, no watermark, no logo, no illustration or cartoon style. ' +
+    'Subtly good-looking and camera-ready, like a fresh up-and-coming actor doing a casual profile headshot — ' +
+    'keep it natural and understated, not glamorous or overly retouched. ' +
     `Subject: ${prompt.slice(0, 300)}`;
 
   try {
