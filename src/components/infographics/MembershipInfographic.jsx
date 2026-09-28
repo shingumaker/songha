@@ -17,10 +17,10 @@ export default function MembershipInfographic({ card }) {
 
   const fields = [
     { label: '이름/Name', value: name },
-    { label: '소속/Member of', value: org },
+    { label: '발급일/Date of issue', value: formatDate(createdAt) },
     { label: '직책/Role', value: role },
     { label: '관심사/Interest', value: intro },
-    { label: '발급일/Date of issue', value: formatDate(createdAt) },
+    { label: '소속/Member of', value: org },
   ].filter((f) => f.value);
 
   return (
@@ -38,45 +38,61 @@ export default function MembershipInfographic({ card }) {
           color: '#1a1a1a',
         }}
       >
-        <Scribble />
+        <Stamp />
 
-        <div style={{ position: 'relative', height: '100%', boxSizing: 'border-box', padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ maxWidth: '68%', fontSize: 6, color: '#333', lineHeight: 1.45 }}>
-            이 카드를 소지한 사람은 창의공화국의 멤버임을 증명합니다.
-            <br />
-            This card certifies the bearer as a member of Republic of Creativity.
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: '8px 10px' }}>
-              {fields.map((f) => (
-                <FieldPair key={f.label} label={f.label} value={f.value} />
-              ))}
+        <div style={{ position: 'relative', height: '100%', boxSizing: 'border-box', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '2px 8px' }}>
+                <svg width="50" height="22" viewBox="0 0 50 22" style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
+                  <ellipse cx="25" cy="11" rx="24" ry="9" fill="none" stroke="#1a1a1a" strokeWidth="1.2" transform="rotate(-3 25 11)" />
+                </svg>
+                <span style={{ position: 'relative', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.01em' }}>
+                  Team
+                </span>
+              </div>
+              <span style={{ fontFamily: "'Playfair Display',serif", fontWeight: 800, fontSize: 12, letterSpacing: '-0.01em' }}>
+                Makerspace
+              </span>
             </div>
-            <div style={{ width: 62, height: 62, borderRadius: 4, background: '#e4e4e4', overflow: 'hidden', flexShrink: 0 }}>
-              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={62} color="#999" />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <span
-              style={{
-                border: '1.5px solid #1a1a1a',
-                borderRadius: 999,
-                padding: '3px 10px',
-                fontFamily: "'Space Grotesk',sans-serif",
-                fontWeight: 800,
-                fontSize: 9,
-                letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              TEAM SHINGU
-            </span>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 700, fontSize: 7, letterSpacing: '0.02em' }}>IDENTIFICATION CARD</div>
+              <div style={{ fontWeight: 700, fontSize: 6.5, letterSpacing: '0.02em' }}>IDENTIFICATION CARD</div>
               <div style={{ fontSize: 6, color: '#555', marginTop: 2 }}>NO. {idNumber(id)}</div>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexGrow: 1 }}>
+            <div style={{ width: 62, height: 78, flexShrink: 0, borderRadius: '50%', background: '#e4e4e4', overflow: 'hidden' }}>
+              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={62} color="#999" />
+            </div>
+            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5 }}>
+              {fields.map((f) => (
+                <div key={f.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 6 }}>
+                    <span style={{ fontWeight: 700, fontSize: 6.5, whiteSpace: 'nowrap' }}>{f.label}</span>
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 8,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '58%',
+                      }}
+                    >
+                      {f.value}
+                    </span>
+                  </div>
+                  <div style={{ borderBottom: '1px dashed #999', marginTop: 2 }} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginLeft: 'auto', marginBottom: 44, maxWidth: '62%', fontSize: 5.2, color: '#333', lineHeight: 1.35, textAlign: 'right' }}>
+            이 카드를 소지한 사람은 Makerspace의 멤버임을 증명합니다.
+            <br />
+            This card certifies the bearer as a member of Makerspace.
           </div>
         </div>
       </div>
@@ -134,27 +150,34 @@ export default function MembershipInfographic({ card }) {
   );
 }
 
-function FieldPair({ label, value }) {
+function Stamp() {
   return (
-    <div style={{ maxWidth: 64 }}>
-      <div style={{ fontWeight: 700, fontSize: 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
-      <div style={{ borderBottom: '1px dashed #999', margin: '2px 0' }} />
-      <div style={{ fontSize: 5.5, color: '#555', whiteSpace: 'nowrap' }}>{label}</div>
+    <div
+      style={{
+        position: 'absolute',
+        right: 10,
+        bottom: 8,
+        width: 46,
+        height: 46,
+        borderRadius: '50%',
+        border: '1.3px dashed #3a7ca8',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        transform: 'rotate(-8deg)',
+        opacity: 0.55,
+        pointerEvents: 'none',
+      }}
+    >
+      <span style={{ fontSize: 4.8, fontWeight: 700, color: '#2f6690', lineHeight: 1.25 }}>
+        SHINGU
+        <br />
+        EXPO.
+        <br />
+        MAKERSPACE
+      </span>
     </div>
-  );
-}
-
-function Scribble() {
-  return (
-    <svg width="30" height="24" viewBox="0 0 70 55" style={{ position: 'absolute', top: 8, right: 10, opacity: 0.5, transform: 'rotate(-6deg)' }}>
-      <path
-        d="M35 6 C14 6 6 18 8 30 C10 44 26 50 40 46 C54 42 60 28 52 16 C46 7 34 8 30 16"
-        fill="none"
-        stroke="#999"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }
 
