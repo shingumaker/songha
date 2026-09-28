@@ -30,7 +30,7 @@ export default function CivicPassInfographic({ card }) {
       <div
         style={{
           aspectRatio: '1.6 / 1',
-          borderRadius: 14,
+          borderRadius: 0,
           overflow: 'hidden',
           position: 'relative',
           boxSizing: 'border-box',
@@ -71,7 +71,7 @@ export default function CivicPassInfographic({ card }) {
             right: 0,
             height: 46,
             background: `linear-gradient(120deg, ${accentLight} 0%, ${ACCENT} 55%, ${accentDark} 100%)`,
-            borderRadius: '14px 14px 0 0',
+            borderRadius: 0,
           }}
         />
         <div
@@ -115,7 +115,7 @@ export default function CivicPassInfographic({ card }) {
               style={{
                 width: 92,
                 height: 108,
-                borderRadius: 8,
+                borderRadius: 0,
                 border: `1.5px solid ${NAVY}59`,
                 background: '#fff',
                 flexShrink: 0,

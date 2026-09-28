@@ -33,7 +33,7 @@ export default function TechPassInfographic({ card }) {
       <div
         style={{
           aspectRatio: '1.6 / 1',
-          borderRadius: 14,
+          borderRadius: 0,
           overflow: 'hidden',
           position: 'relative',
           boxSizing: 'border-box',
@@ -78,7 +78,7 @@ export default function TechPassInfographic({ card }) {
                 style={{
                   width: 14,
                   height: 14,
-                  borderRadius: 4,
+                  borderRadius: 0,
                   background: ACCENT,
                   display: 'flex',
                   alignItems: 'center',
@@ -106,7 +106,7 @@ export default function TechPassInfographic({ card }) {
               style={{
                 width: 92,
                 height: 108,
-                borderRadius: 8,
+                borderRadius: 0,
                 border: '1.5px solid rgba(232,228,218,0.25)',
                 background: 'rgba(255,255,255,0.04)',
                 flexShrink: 0,
