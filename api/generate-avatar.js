@@ -18,10 +18,12 @@ export default async function handler(req, res) {
   }
 
   const fullPrompt =
-    'A realistic photographic headshot portrait, natural lighting, shot on a camera, simple neutral background, ' +
-    'single person centered, head-and-shoulders, high detail, no text, no watermark, no logo, no illustration or cartoon style. ' +
-    'Subtly good-looking and camera-ready, like a fresh up-and-coming actor doing a casual profile headshot — ' +
-    'keep it natural and understated, not glamorous or overly retouched. ' +
+    'A semi-realistic digital illustration headshot portrait — mostly lifelike proportions and lighting, ' +
+    'but blended with a soft Korean romance-comic (순정만화) art style: clean line art, smooth cel shading, ' +
+    'slightly softened features and gently expressive eyes, subtle good-looking and camera-ready look like a ' +
+    'fresh up-and-coming actor. This should clearly read as a stylized AI illustration, not a photograph, but ' +
+    'not a flat cartoon either — keep it tasteful and understated, not overly glamorous. ' +
+    'Simple clean background, single person centered, head-and-shoulders, no text, no watermark, no logo. ' +
     `Subject: ${prompt.slice(0, 300)}`;
 
   try {
