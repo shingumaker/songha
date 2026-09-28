@@ -17,12 +17,24 @@ export default async function handler(req, res) {
     return;
   }
 
+  const STYLE_PROMPTS = {
+    webtoon:
+      'A semi-realistic digital illustration headshot portrait — mostly lifelike proportions and lighting, ' +
+      'but blended with a soft Korean romance-comic (순정만화) art style: clean line art, smooth cel shading, ' +
+      'slightly softened features and gently expressive eyes, subtle good-looking and camera-ready look like a ' +
+      'fresh up-and-coming actor. This should clearly read as a stylized AI illustration, not a photograph, but ' +
+      'not a flat cartoon either — keep it tasteful and understated, not overly glamorous.',
+    pixar:
+      'A charming 3D-animated character portrait in the style of modern Pixar/Disney animation — big expressive ' +
+      'eyes, smooth stylized 3D shading and soft studio lighting, friendly and warm expression.',
+    insta:
+      'A hyper-polished, flawless AI-generated profile photo in the trending "AI profile picture" style — ' +
+      'glowing even skin, perfectly symmetrical features, glossy studio lighting, high-end fashion-photo finish.',
+  };
+  const style = STYLE_PROMPTS[req.body?.style] ? req.body.style : 'webtoon';
+
   const fullPrompt =
-    'A semi-realistic digital illustration headshot portrait — mostly lifelike proportions and lighting, ' +
-    'but blended with a soft Korean romance-comic (순정만화) art style: clean line art, smooth cel shading, ' +
-    'slightly softened features and gently expressive eyes, subtle good-looking and camera-ready look like a ' +
-    'fresh up-and-coming actor. This should clearly read as a stylized AI illustration, not a photograph, but ' +
-    'not a flat cartoon either — keep it tasteful and understated, not overly glamorous. ' +
+    `${STYLE_PROMPTS[style]} ` +
     'Simple clean background, single person centered, head-and-shoulders, no text, no watermark, no logo. ' +
     `Subject: ${prompt.slice(0, 300)}`;
 

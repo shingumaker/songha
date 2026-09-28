@@ -7,6 +7,12 @@ const MODES = [
   { key: 'ai', label: 'AI 이미지 생성' },
 ];
 
+const AI_STYLES = [
+  { key: 'webtoon', label: '반실사 웹툰풍' },
+  { key: 'pixar', label: '픽사풍 3D' },
+  { key: 'insta', label: '인스타 AI 프로필' },
+];
+
 export default function Step5Photo() {
   const {
     step,
@@ -26,6 +32,7 @@ export default function Step5Photo() {
   const fileInputRef = useRef(null);
   const [mode, setMode] = useState(avatarIcon ? 'icon' : 'upload');
   const [aiPrompt, setAiPrompt] = useState('');
+  const [aiStyle, setAiStyle] = useState('webtoon');
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState('');
 
@@ -37,7 +44,7 @@ export default function Step5Photo() {
       const res = await fetch('/api/generate-avatar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt.trim() }),
+        body: JSON.stringify({ prompt: aiPrompt.trim(), style: aiStyle }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || '이미지 생성에 실패했습니다.');
@@ -111,6 +118,20 @@ export default function Step5Photo() {
 
       {mode === 'ai' && (
         <div>
+          <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 10 }}>
+            {AI_STYLES.map((s) => (
+              <div
+                key={s.key}
+                className={`tpl-card${aiStyle === s.key ? ' selected' : ''}`}
+                style={{ padding: '8px 6px', textAlign: 'center' }}
+                onClick={() => setAiStyle(s.key)}
+              >
+                <div className="n" style={{ fontSize: 11 }}>
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
           <textarea
             rows={3}
             placeholder="예: 안경 쓴 웃는 얼굴의 메이커, 파란 후드티"
