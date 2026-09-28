@@ -74,6 +74,33 @@ function pickRandomStyle(keys) {
   return keys[Math.floor(Math.random() * keys.length)];
 }
 
+// Photos are stored inline on the Firestore card document (no Storage
+// bucket needed), so every photo source (upload or AI-generated) must be
+// downscaled well under Firestore's 1MiB field limit before it's saved.
+function resizeImageDataUrl(src, maxSize = 320, quality = 0.8) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height) {
+        if (width > maxSize) {
+          height = Math.round((height * maxSize) / width);
+          width = maxSize;
+        }
+      } else if (height > maxSize) {
+        width = Math.round((width * maxSize) / height);
+        height = maxSize;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = src;
+  });
+}
+
 const SAVE_TIMEOUT_MS = 15000;
 
 function withTimeout(promise, ms) {
@@ -179,29 +206,8 @@ export function CardProvider({ children, mode = 'profile' }) {
     if (!file) return;
     setAvatarIcon(null);
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxSize = 320;
-        let { width, height } = img;
-        if (width > height) {
-          if (width > maxSize) {
-            height = Math.round((height * maxSize) / width);
-            width = maxSize;
-          }
-        } else if (height > maxSize) {
-          width = Math.round((width * maxSize) / height);
-          height = maxSize;
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        // Photos are stored inline on the Firestore card document (no Storage
-        // bucket needed), so keep them well under Firestore's 1MiB field limit.
-        setPhotoPreview(canvas.toDataURL('image/jpeg', 0.8));
-      };
-      img.src = ev.target.result;
+    reader.onload = async (ev) => {
+      setPhotoPreview(await resizeImageDataUrl(ev.target.result));
     };
     reader.readAsDataURL(file);
   }, []);
@@ -213,7 +219,7 @@ export function CardProvider({ children, mode = 'profile' }) {
 
   const setAiPhoto = useCallback((dataUrl) => {
     setAvatarIcon(null);
-    setPhotoPreview(dataUrl);
+    resizeImageDataUrl(dataUrl).then(setPhotoPreview);
   }, []);
 
   const resetFlow = useCallback(() => {
