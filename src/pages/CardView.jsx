@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore/lite';
+import { toPng } from 'html-to-image';
 import { db } from '../lib/firebase';
 import InfographicRenderer from '../components/infographics/InfographicRenderer';
 
@@ -17,6 +18,8 @@ export default function CardView() {
   const { id } = useParams();
   const [status, setStatus] = useState('loading');
   const [card, setCard] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const cardRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,6 +46,22 @@ export default function CardView() {
     };
   }, [id]);
 
+  const saveAsImage = async () => {
+    if (!cardRef.current) return;
+    setSaving(true);
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = `profile-card-${id}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('이미지 저장 실패:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="app card-page">
       <div className="preview-wrap">
@@ -66,7 +85,16 @@ export default function CardView() {
           </div>
         )}
 
-        {status === 'ready' && card && <InfographicRenderer card={card} />}
+        {status === 'ready' && card && (
+          <>
+            <div ref={cardRef} style={{ width: '100%' }}>
+              <InfographicRenderer card={card} />
+            </div>
+            <button className="ghost" style={{ width: '100%', marginTop: 14 }} onClick={saveAsImage} disabled={saving}>
+              {saving ? '저장 중...' : '이미지로 저장'}
+            </button>
+          </>
+        )}
 
         <Link className="back-link" to="/">
           새 프로필 만들기 →
