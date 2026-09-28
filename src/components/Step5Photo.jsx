@@ -28,6 +28,9 @@ export default function Step5Photo() {
     issuing,
     issueCard,
     goStep,
+    fields,
+    personality,
+    favorites,
   } = useCard();
   const fileInputRef = useRef(null);
   const [mode, setMode] = useState(avatarIcon ? 'icon' : 'upload');
@@ -35,6 +38,14 @@ export default function Step5Photo() {
   const [aiStyle, setAiStyle] = useState('webtoon');
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState('');
+
+  const profileContext = [
+    fields?.name?.trim() && `이름: ${fields.name.trim()}`,
+    personality?.length > 0 && `성격·취향: ${personality.map((p) => p.title).join(', ')}`,
+    favorites?.length > 0 && `관심사: ${favorites.map((f) => f.title).join(', ')}`,
+  ]
+    .filter(Boolean)
+    .join(' / ');
 
   const generateAiImage = async () => {
     if (!aiPrompt.trim() || aiGenerating) return;
@@ -44,7 +55,7 @@ export default function Step5Photo() {
       const res = await fetch('/api/generate-avatar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt.trim(), style: aiStyle }),
+        body: JSON.stringify({ prompt: aiPrompt.trim(), style: aiStyle, context: profileContext }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || '이미지 생성에 실패했습니다.');
@@ -139,7 +150,8 @@ export default function Step5Photo() {
             onChange={(e) => setAiPrompt(e.target.value)}
           />
           <div className="hint" style={{ marginTop: 6 }}>
-            원하는 모습을 짧게 설명하면 AI가 프로필 아이콘을 만들어 드려요. 생성에 몇 초 정도 걸립니다.
+            원하는 모습을 짧게 설명하면 AI가 프로필 아이콘을 만들어 드려요. 앞서 입력한 이름·성격·관심사도 자동으로
+            반영돼서 어울리는 분위기로 생성됩니다. 생성에 몇 초 정도 걸립니다.
           </div>
           <button
             className="ghost"

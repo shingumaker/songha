@@ -32,11 +32,16 @@ export default async function handler(req, res) {
       'glowing even skin, perfectly symmetrical features, glossy studio lighting, high-end fashion-photo finish.',
   };
   const style = STYLE_PROMPTS[req.body?.style] ? req.body.style : 'webtoon';
+  const context = typeof req.body?.context === 'string' ? req.body.context.trim().slice(0, 300) : '';
 
   const fullPrompt =
     `${STYLE_PROMPTS[style]} ` +
     'Simple clean background, single person centered, head-and-shoulders, no text, no watermark, no logo. ' +
-    `Subject: ${prompt.slice(0, 300)}`;
+    `Subject: ${prompt.slice(0, 300)}` +
+    (context
+      ? ` Subtly let this person's profile inform the mood, styling, and expression (do not render any text, ` +
+        `props, or literal symbols for it): ${context}.`
+      : '');
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/images/generations', {
