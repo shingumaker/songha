@@ -18,8 +18,8 @@ export default async function handler(req, res) {
   }
 
   const fullPrompt =
-    'A friendly flat-illustration profile avatar icon, colorful and clean, simple solid background, ' +
-    'single person centered, head-and-shoulders portrait, no text, no watermark, no logo. ' +
+    'A realistic photographic headshot portrait, natural lighting, shot on a camera, simple neutral background, ' +
+    'single person centered, head-and-shoulders, high detail, no text, no watermark, no logo, no illustration or cartoon style. ' +
     `Subject: ${prompt.slice(0, 300)}`;
 
   try {
