@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import stampImg from '../../assets/stamp-makerspace.webp';
 
 function idNumber(id) {
   const base = (id || 'guest0').toUpperCase().padEnd(6, '0').slice(0, 6);
@@ -152,32 +153,21 @@ export default function MembershipInfographic({ card }) {
 
 function Stamp() {
   return (
-    <div
+    <img
+      src={stampImg}
+      alt=""
       style={{
         position: 'absolute',
-        right: 10,
-        bottom: 8,
-        width: 46,
-        height: 46,
-        borderRadius: '50%',
-        border: '1.3px dashed #3a7ca8',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
+        right: 6,
+        bottom: 4,
+        width: 58,
+        height: 'auto',
+        opacity: 0.6,
+        mixBlendMode: 'multiply',
         transform: 'rotate(-8deg)',
-        opacity: 0.55,
         pointerEvents: 'none',
       }}
-    >
-      <span style={{ fontSize: 4.8, fontWeight: 700, color: '#2f6690', lineHeight: 1.25 }}>
-        SHINGU
-        <br />
-        EXPO.
-        <br />
-        MAKERSPACE
-      </span>
-    </div>
+    />
   );
 }
 

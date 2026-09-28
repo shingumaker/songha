@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import stampImg from '../../assets/stamp-makerspace.webp';
 
 const INK = '#16325c';
 
@@ -172,33 +173,21 @@ function FieldLine({ label, value }) {
 
 function Stamp() {
   return (
-    <div
+    <img
+      src={stampImg}
+      alt=""
       style={{
         position: 'absolute',
-        right: 4,
-        bottom: 30,
-        width: 56,
-        height: 56,
-        borderRadius: '50%',
-        border: `1.5px dashed ${INK}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        transform: 'rotate(-10deg)',
-        opacity: 0.4,
+        right: -2,
+        bottom: 24,
+        width: 62,
+        height: 'auto',
+        opacity: 0.55,
         mixBlendMode: 'multiply',
+        transform: 'rotate(-8deg)',
         pointerEvents: 'none',
       }}
-    >
-      <span style={{ fontSize: 6, fontWeight: 700, color: INK, lineHeight: 1.3 }}>
-        SHINGU
-        <br />
-        EXPO.
-        <br />
-        MAKERSPACE
-      </span>
-    </div>
+    />
   );
 }
 
