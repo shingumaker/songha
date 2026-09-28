@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore/lite';
-import { toPng } from 'html-to-image';
 import { db } from '../lib/firebase';
+import { exportCardAsImage } from '../lib/exportCardImage';
 import InfographicRenderer from '../components/infographics/InfographicRenderer';
 
 const LOAD_TIMEOUT_MS = 15000;
@@ -47,14 +47,9 @@ export default function CardView() {
   }, [id]);
 
   const saveAsImage = async () => {
-    if (!cardRef.current) return;
     setSaving(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `profile-card-${id}.png`;
-      link.href = dataUrl;
-      link.click();
+      await exportCardAsImage(cardRef.current, card?.style, `profile-card-${id}.png`);
     } catch (err) {
       console.error('이미지 저장 실패:', err);
     } finally {

@@ -10,6 +10,7 @@ const MODES = [
 export default function Step5Photo() {
   const {
     step,
+    currentStepName,
     photoPreview,
     handlePhotoFile,
     avatarIcon,
@@ -25,7 +26,7 @@ export default function Step5Photo() {
   const [mode, setMode] = useState(avatarIcon ? 'icon' : 'upload');
 
   return (
-    <div className={`panel${step === 5 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'photo' ? ' active' : ''}`}>
       <label>프로필 사진</label>
 
       <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 14 }}>
@@ -110,7 +111,7 @@ export default function Step5Photo() {
       </div>
 
       <div className="nav-row">
-        <button className="ghost" onClick={() => goStep(4)}>
+        <button className="ghost" onClick={() => goStep(step - 1)}>
           이전
         </button>
         <button className="primary" disabled={!consent || issuing} onClick={issueCard}>

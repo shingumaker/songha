@@ -2,10 +2,10 @@ import { useCard } from '../context/CardContext';
 import { STYLE_META } from '../context/CardContext';
 
 export default function Step4StyleSelect() {
-  const { step, style, selectStyle, goStep, styleKeys } = useCard();
+  const { step, currentStepName, style, selectStyle, goStep, styleKeys } = useCard();
 
   return (
-    <div className={`panel${step === 4 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'style' ? ' active' : ''}`}>
       <div className="hint" style={{ marginTop: 0, marginBottom: 14 }}>
         발급될 인포그래픽 카드의 디자인을 골라주세요.
       </div>
@@ -34,10 +34,14 @@ export default function Step4StyleSelect() {
       </div>
 
       <div className="nav-row">
-        <button className="ghost" onClick={() => goStep(3)}>
-          이전
-        </button>
-        <button className="primary" disabled={!style} onClick={() => goStep(5)}>
+        {step > 1 ? (
+          <button className="ghost" onClick={() => goStep(step - 1)}>
+            이전
+          </button>
+        ) : (
+          <span></span>
+        )}
+        <button className="primary" disabled={!style} onClick={() => goStep(step + 1)}>
           다음
         </button>
       </div>

@@ -129,11 +129,9 @@ export default function CivicPassInfographic({ card }) {
               <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 15, color: NAVY, lineHeight: 1.25 }}>
                 {name}
               </div>
-              {(org || role) && (
-                <div style={{ fontSize: 15, color: '#6b7a99', marginTop: 3, lineHeight: 1.25 }}>
-                  {[org, role].filter(Boolean).join(' · ')}
-                </div>
-              )}
+              <div style={{ fontSize: 15, color: '#6b7a99', marginTop: 3, lineHeight: 1.25 }}>
+                {[org, role].filter(Boolean).join(' · ') || ' '}
+              </div>
             </div>
           </div>
 

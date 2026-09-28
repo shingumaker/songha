@@ -3,6 +3,7 @@ import { useCard } from '../context/CardContext';
 export default function Step2Info() {
   const {
     step,
+    currentStepName,
     template,
     templateCopy,
     fields,
@@ -21,7 +22,7 @@ export default function Step2Info() {
   const nameValid = fields.name.trim().length > 0;
 
   return (
-    <div className={`panel${step === 2 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'info' ? ' active' : ''}`}>
       <label>
         이름 <span className="req">*</span>
       </label>
@@ -133,10 +134,10 @@ export default function Step2Info() {
       )}
 
       <div className="nav-row">
-        <button className="ghost" onClick={() => goStep(1)}>
+        <button className="ghost" onClick={() => goStep(step - 1)}>
           이전
         </button>
-        <button className="primary" disabled={!nameValid} onClick={() => goStep(3)}>
+        <button className="primary" disabled={!nameValid} onClick={() => goStep(step + 1)}>
           다음
         </button>
       </div>

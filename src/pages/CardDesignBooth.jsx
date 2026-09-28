@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { CardProvider } from '../context/CardContext';
 import Stepper from '../components/Stepper';
-import Step1Template from '../components/Step1Template';
 import Step2Info from '../components/Step2Info';
 import Step3PersonalityFavorites from '../components/Step3PersonalityFavorites';
 import Step4StyleSelect from '../components/Step4StyleSelect';
@@ -25,10 +24,9 @@ function CardDesignFlow() {
 
         <Stepper />
 
-        <Step1Template />
+        <Step4StyleSelect />
         <Step2Info />
         <Step3PersonalityFavorites />
-        <Step4StyleSelect />
         <Step5Photo />
         <Step6Done />
       </div>

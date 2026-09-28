@@ -3,6 +3,7 @@ import { useCard } from '../context/CardContext';
 export default function Step3PersonalityFavorites() {
   const {
     step,
+    currentStepName,
     personality,
     addPersonalityItem,
     updatePersonalityItem,
@@ -15,7 +16,7 @@ export default function Step3PersonalityFavorites() {
   } = useCard();
 
   return (
-    <div className={`panel${step === 3 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'personality' ? ' active' : ''}`}>
       <label>
         성격 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(최대 3개, 선택)</span>
       </label>
@@ -80,10 +81,10 @@ export default function Step3PersonalityFavorites() {
       </button>
 
       <div className="nav-row">
-        <button className="ghost" onClick={() => goStep(2)}>
+        <button className="ghost" onClick={() => goStep(step - 1)}>
           이전
         </button>
-        <button className="primary" onClick={() => goStep(4)}>
+        <button className="primary" onClick={() => goStep(step + 1)}>
           다음
         </button>
       </div>

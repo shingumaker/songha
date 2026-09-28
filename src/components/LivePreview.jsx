@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
-import { toPng } from 'html-to-image';
 import { useCard } from '../context/CardContext';
+import { exportCardAsImage } from '../lib/exportCardImage';
 import BadgePreview from './BadgePreview';
 import InfographicRenderer from './infographics/InfographicRenderer';
 
 export default function LivePreview() {
   const {
-    step,
     style,
     template,
     fields,
@@ -22,7 +21,7 @@ export default function LivePreview() {
   const cardRef = useRef(null);
   const [saving, setSaving] = useState(false);
 
-  if (step < 4 || !style) {
+  if (!style) {
     return <BadgePreview />;
   }
 
@@ -43,14 +42,9 @@ export default function LivePreview() {
   };
 
   const saveAsImage = async () => {
-    if (!cardRef.current) return;
     setSaving(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `profile-card-${issuedCard?.id || 'preview'}.png`;
-      link.href = dataUrl;
-      link.click();
+      await exportCardAsImage(cardRef.current, style, `profile-card-${issuedCard?.id || 'preview'}.png`);
     } catch (err) {
       console.error('이미지 저장 실패:', err);
     } finally {

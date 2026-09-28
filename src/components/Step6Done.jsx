@@ -1,10 +1,10 @@
 import { useCard } from '../context/CardContext';
 
 export default function Step6Done() {
-  const { step, issuedCard, resetFlow } = useCard();
+  const { currentStepName, issuedCard, resetFlow } = useCard();
 
   return (
-    <div className={`panel${step === 6 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'done' ? ' active' : ''}`}>
       <div className="done-screen">
         <div className="big-check">✓</div>
         <h2>프로필이 생성되었습니다</h2>

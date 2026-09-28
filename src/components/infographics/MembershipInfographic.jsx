@@ -21,7 +21,7 @@ export default function MembershipInfographic({ card }) {
     { label: '직책/Role', value: role },
     { label: '관심사/Interest', value: intro },
     { label: '소속/Member of', value: org },
-  ].filter((f) => f.value);
+  ];
 
   return (
     <div style={{ fontFamily: "'Noto Sans KR',sans-serif", width: '100%' }}>
@@ -80,7 +80,7 @@ export default function MembershipInfographic({ card }) {
                         maxWidth: '58%',
                       }}
                     >
-                      {f.value}
+                      {f.value || ' '}
                     </span>
                   </div>
                   <div style={{ borderBottom: '1px dashed #999', marginTop: 2 }} />

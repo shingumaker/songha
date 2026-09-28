@@ -50,6 +50,20 @@ const PROFILE_STYLE_KEYS = Object.keys(PROFILE_STYLE_META);
 const CARD_STYLE_KEYS = Object.keys(CARD_STYLE_META);
 const STYLE_KEYS = Object.keys(STYLE_META);
 
+const STEP_SEQUENCES = {
+  profile: ['template', 'info', 'personality', 'style', 'photo', 'done'],
+  card: ['style', 'info', 'personality', 'photo', 'done'],
+};
+
+const STEP_LABELS = {
+  template: '유형선택',
+  info: '정보입력',
+  personality: '성격·취향',
+  style: '스타일',
+  photo: '사진',
+  done: '발급',
+};
+
 const AVATAR_ICONS = ['🚀', '🎨', '🧠', '⚡', '🌱', '🎯', '🦄', '🐝'];
 
 function randomId() {
@@ -79,8 +93,9 @@ const initialFields = {
 
 export function CardProvider({ children, mode = 'profile' }) {
   const styleKeys = mode === 'card' ? CARD_STYLE_KEYS : PROFILE_STYLE_KEYS;
+  const stepSequence = STEP_SEQUENCES[mode] || STEP_SEQUENCES.profile;
   const [step, setStep] = useState(1);
-  const [template, setTemplate] = useState(null);
+  const [template, setTemplate] = useState(mode === 'card' ? 'profile' : null);
   const [fields, setFields] = useState(initialFields);
   const [links, setLinks] = useState(['']);
   const [portfolio, setPortfolio] = useState([]);
@@ -198,7 +213,7 @@ export function CardProvider({ children, mode = 'profile' }) {
 
   const resetFlow = useCallback(() => {
     setStep(1);
-    setTemplate(null);
+    setTemplate(mode === 'card' ? 'profile' : null);
     setFields(initialFields);
     setLinks(['']);
     setPortfolio([]);
@@ -210,7 +225,7 @@ export function CardProvider({ children, mode = 'profile' }) {
     setConsent(false);
     setStatusLine('');
     setIssuedCard(null);
-  }, []);
+  }, [mode]);
 
   const issueCard = useCallback(async () => {
     setIssuing(true);
@@ -247,13 +262,15 @@ export function CardProvider({ children, mode = 'profile' }) {
     const url = `${window.location.origin}/card/${id}`;
     setIssuedCard({ id, url });
     setIssuing(false);
-    goStep(6);
-  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys]);
+    goStep(stepSequence.length);
+  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys, stepSequence]);
 
   const value = useMemo(
     () => ({
       step,
       goStep,
+      stepSequence,
+      currentStepName: stepSequence[step - 1],
       styleKeys,
       template,
       selectTemplate,
@@ -294,6 +311,7 @@ export function CardProvider({ children, mode = 'profile' }) {
     [
       step,
       goStep,
+      stepSequence,
       styleKeys,
       template,
       selectTemplate,
@@ -339,4 +357,4 @@ export function useCard() {
   return ctx;
 }
 
-export { TEMPLATE_COPY, STYLE_META, STYLE_KEYS, PROFILE_STYLE_KEYS, CARD_STYLE_KEYS };
+export { TEMPLATE_COPY, STYLE_META, STYLE_KEYS, PROFILE_STYLE_KEYS, CARD_STYLE_KEYS, STEP_LABELS };
