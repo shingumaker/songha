@@ -1,6 +1,13 @@
 import AvatarDisplay from './AvatarDisplay';
 import stampImg from '../../assets/stamp-makerspace.webp';
 
+// All positions/sizes below are ported directly from the design canvas's
+// 856x540 Membership.dc.html artboard, converted to container-query units
+// (cqw = % of card width, cqh = % of card height) so the layout is a
+// faithful proportional replica at any render size.
+const cqw = (px) => `${(px / 856) * 100}cqw`;
+const cqh = (px) => `${(px / 540) * 100}cqh`;
+
 function idNumber(id) {
   const base = (id || 'guest0').toUpperCase().padEnd(6, '0').slice(0, 6);
   return 'SH' + base;
@@ -28,8 +35,9 @@ export default function MembershipInfographic({ card }) {
     <div style={{ fontFamily: "'Noto Sans KR',sans-serif", width: '100%' }}>
       <div
         style={{
-          aspectRatio: '1.6 / 1',
-          borderRadius: 14,
+          aspectRatio: '856 / 540',
+          containerType: 'size',
+          borderRadius: cqw(26),
           overflow: 'hidden',
           position: 'relative',
           boxSizing: 'border-box',
@@ -41,60 +49,66 @@ export default function MembershipInfographic({ card }) {
       >
         <Stamp />
 
-        <div style={{ position: 'relative', height: '100%', boxSizing: 'border-box', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {/* padding lives on this inner wrapper (not the query-container card
+            itself) so cqw/cqh keep resolving against the full 856x540 card,
+            matching the canvas's own coordinate space exactly */}
+        <div style={{ position: 'absolute', inset: 0, boxSizing: 'border-box', padding: `${cqh(36)} ${cqw(42)}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '2px 8px' }}>
-                <svg width="50" height="22" viewBox="0 0 50 22" style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
-                  <ellipse cx="25" cy="11" rx="24" ry="9" fill="none" stroke="#1a1a1a" strokeWidth="1.2" transform="rotate(-3 25 11)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(16) }}>
+              <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: `${cqh(5)} ${cqw(18)}` }}>
+                <svg viewBox="0 0 140 62" style={{ position: 'absolute', inset: 0, width: cqw(140), height: cqh(62), overflow: 'visible' }}>
+                  <ellipse cx="70" cy="31" rx="67" ry="26" fill="none" stroke="#1a1a1a" strokeWidth="3" transform="rotate(-3 70 31)" />
                 </svg>
-                <span style={{ position: 'relative', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.01em' }}>
+                <span style={{ position: 'relative', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(36), letterSpacing: '0.01em' }}>
                   Team
                 </span>
               </div>
-              <span style={{ fontFamily: "'Playfair Display',serif", fontWeight: 800, fontSize: 12, letterSpacing: '-0.01em' }}>
+              <span style={{ fontFamily: "'Playfair Display',serif", fontWeight: 800, fontSize: cqw(36), letterSpacing: '-0.01em' }}>
                 Makerspace
               </span>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 700, fontSize: 6.5, letterSpacing: '0.02em' }}>IDENTIFICATION CARD</div>
-              <div style={{ fontSize: 6, color: '#555', marginTop: 2 }}>NO. {idNumber(id)}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(8) }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: cqw(17), letterSpacing: '0.03em' }}>IDENTIFICATION CARD</div>
+                <div style={{ fontSize: cqw(14), color: '#555', marginTop: cqh(3) }}>NO. {idNumber(id)}</div>
+              </div>
+              <span style={{ fontSize: cqw(21), color: '#999' }}>&rsaquo;</span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexGrow: 1 }}>
-            <div style={{ width: 62, height: 78, flexShrink: 0, borderRadius: '50%', background: '#e4e4e4', overflow: 'hidden' }}>
-              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={62} color="#999" />
+          <div style={{ display: 'flex', gap: cqw(34), marginTop: cqh(28) }}>
+            <div style={{ width: cqw(283), height: cqh(346), flexShrink: 0, borderRadius: '50%', background: '#e4e4e4', overflow: 'hidden' }}>
+              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={80} color="#999" />
             </div>
-            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 5 }}>
+            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: cqh(17) }}>
               {fields.map((f) => (
                 <div key={f.label}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 6 }}>
-                    <span style={{ fontWeight: 700, fontSize: 6.5, whiteSpace: 'nowrap' }}>{f.label}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: cqw(13) }}>
+                    <span style={{ fontWeight: 700, fontSize: cqw(17), whiteSpace: 'nowrap' }}>{f.label}</span>
                     <span
                       style={{
                         fontWeight: 700,
-                        fontSize: 8,
+                        fontSize: cqw(21),
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         maxWidth: '58%',
                       }}
                     >
-                      {f.value || ' '}
+                      {f.value || ' '}
                     </span>
                   </div>
-                  <div style={{ borderBottom: '1px dashed #999', marginTop: 2 }} />
+                  <div style={{ borderBottom: '1px dashed #999', marginTop: cqh(5) }} />
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          <div style={{ marginLeft: 'auto', marginBottom: 44, maxWidth: '62%', fontSize: 5.2, color: '#333', lineHeight: 1.35, textAlign: 'right' }}>
-            이 카드를 소지한 사람은 Makerspace의 멤버임을 증명합니다.
-            <br />
-            This card certifies the bearer as a member of Makerspace.
-          </div>
+        <div style={{ position: 'absolute', left: cqw(358), top: cqh(446), width: cqw(395), fontSize: cqw(14), color: '#333', lineHeight: 1.5, textAlign: 'right' }}>
+          이 카드를 소지한 사람은 Makerspace의 멤버임을 증명합니다.
+          <br />
+          This card certifies the bearer as a member of Makerspace.
         </div>
       </div>
 
@@ -158,11 +172,11 @@ function Stamp() {
       alt=""
       style={{
         position: 'absolute',
-        right: 6,
-        bottom: 4,
-        width: 58,
-        height: 'auto',
-        opacity: 0.6,
+        right: cqw(37),
+        bottom: cqh(39),
+        width: cqw(130),
+        height: cqh(72),
+        opacity: 0.85,
         mixBlendMode: 'multiply',
         transform: 'rotate(-8deg)',
         pointerEvents: 'none',

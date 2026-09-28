@@ -3,6 +3,13 @@ import stampImg from '../../assets/stamp-makerspace.webp';
 
 const INK = '#16325c';
 
+// All positions/sizes below are ported directly from the design canvas's
+// 856x540 License.dc.html artboard, converted to container-query units
+// (cqw = % of card width, cqh = % of card height) so the layout is a
+// faithful proportional replica at any render size.
+const cqw = (px) => `${(px / 856) * 100}cqw`;
+const cqh = (px) => `${(px / 540) * 100}cqh`;
+
 function licenseNumber(id) {
   const base = (id || 'guest0').toUpperCase().padEnd(7, '0').slice(0, 7);
   return 'SH' + base;
@@ -25,55 +32,56 @@ export default function LicenseInfographic({ card }) {
     <div style={{ fontFamily: "'Courier Prime',monospace", width: '100%' }}>
       <div
         style={{
-          aspectRatio: '1.6 / 1',
-          borderRadius: 14,
+          aspectRatio: '856 / 540',
+          containerType: 'size',
+          borderRadius: cqw(18),
           overflow: 'hidden',
           position: 'relative',
           boxSizing: 'border-box',
           background: '#d7e6f2',
-          boxShadow: '0 14px 32px rgba(20,50,80,0.3)',
+          boxShadow: `0 ${cqh(30)} ${cqw(70)} rgba(20,50,80,0.22)`,
         }}
       >
-        <div style={{ position: 'absolute', top: 6, left: 26, right: 26, display: 'flex', justifyContent: 'space-between', color: INK, fontSize: 8 }}>
+        <div style={{ position: 'absolute', top: cqh(12), left: cqw(56), right: cqw(56), display: 'flex', justifyContent: 'space-between', color: INK, fontSize: cqw(22) }}>
           {STAR_ROW.map((_, i) => (
             <span key={i}>★</span>
           ))}
         </div>
-        <div style={{ position: 'absolute', bottom: 6, left: 26, right: 26, display: 'flex', justifyContent: 'space-between', color: INK, fontSize: 8 }}>
+        <div style={{ position: 'absolute', bottom: cqh(12), left: cqw(56), right: cqw(56), display: 'flex', justifyContent: 'space-between', color: INK, fontSize: cqw(22) }}>
           {STAR_ROW.map((_, i) => (
             <span key={i}>★</span>
           ))}
         </div>
-        <div style={{ position: 'absolute', top: 20, bottom: 20, left: 4, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', color: INK, fontSize: 8 }}>
+        <div style={{ position: 'absolute', top: cqh(56), bottom: cqh(56), left: cqw(10), display: 'flex', flexDirection: 'column', justifyContent: 'space-between', color: INK, fontSize: cqw(22) }}>
           {STAR_COL.map((_, i) => (
             <span key={i}>★</span>
           ))}
         </div>
-        <div style={{ position: 'absolute', top: 20, bottom: 20, right: 4, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', color: INK, fontSize: 8 }}>
+        <div style={{ position: 'absolute', top: cqh(56), bottom: cqh(56), right: cqw(10), display: 'flex', flexDirection: 'column', justifyContent: 'space-between', color: INK, fontSize: cqw(22) }}>
           {STAR_COL.map((_, i) => (
             <span key={i}>★</span>
           ))}
         </div>
-        <span style={{ position: 'absolute', top: 6, left: 8, color: INK, fontSize: 8 }}>★</span>
-        <span style={{ position: 'absolute', top: 6, right: 8, color: INK, fontSize: 8 }}>★</span>
-        <span style={{ position: 'absolute', bottom: 6, left: 8, color: INK, fontSize: 8 }}>★</span>
-        <span style={{ position: 'absolute', bottom: 6, right: 8, color: INK, fontSize: 8 }}>★</span>
+        <span style={{ position: 'absolute', top: cqh(12), left: cqw(20), color: INK, fontSize: cqw(22) }}>★</span>
+        <span style={{ position: 'absolute', top: cqh(12), right: cqw(20), color: INK, fontSize: cqw(22) }}>★</span>
+        <span style={{ position: 'absolute', bottom: cqh(12), left: cqw(20), color: INK, fontSize: cqw(22) }}>★</span>
+        <span style={{ position: 'absolute', bottom: cqh(12), right: cqw(20), color: INK, fontSize: cqw(22) }}>★</span>
 
-        <div style={{ position: 'absolute', inset: 20, display: 'flex', gap: 10 }}>
-          <div style={{ width: 76, flexShrink: 0, alignSelf: 'center', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ width: 76, height: 90, background: '#eef4f8', border: `1px solid ${INK}4d`, overflow: 'hidden' }}>
-              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={76} color={INK} />
+        <div style={{ position: 'absolute', top: cqh(44), bottom: cqh(44), left: cqw(44), right: cqw(44), display: 'flex', gap: cqw(22) }}>
+          <div style={{ width: cqw(285), flexShrink: 0, alignSelf: 'center', display: 'flex', flexDirection: 'column', height: cqh(364) }}>
+            <div style={{ width: cqw(285), height: cqh(340), background: '#eef4f8', border: `1px solid ${INK}4d`, overflow: 'hidden' }}>
+              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={92} color={INK} />
             </div>
-            <div style={{ fontSize: 5, color: INK, textAlign: 'right', padding: '3px 1px' }}>Photograph of Authorized maker</div>
+            <div style={{ fontSize: cqw(11), color: INK, textAlign: 'right', padding: `${cqh(6)} ${cqw(2)}` }}>Photograph of Authorized maker</div>
           </div>
 
           <div style={{ flexGrow: 1, minWidth: 0, color: INK, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative' }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 8.5, letterSpacing: '0.01em', textAlign: 'center' }}>PERMANENT LICENSE OF MAKER</div>
-              <div style={{ fontWeight: 700, fontSize: 6, marginTop: 2, textAlign: 'center' }}>NO. {licenseNumber(id)}</div>
+              <div style={{ fontWeight: 700, fontSize: cqw(22), letterSpacing: '0.01em', textAlign: 'center' }}>PERMANENT LICENSE OF MAKER</div>
+              <div style={{ fontWeight: 700, fontSize: cqw(14), marginTop: cqh(6), textAlign: 'center' }}>NO. {licenseNumber(id)}</div>
             </div>
 
-            <div style={{ fontSize: 6.5, lineHeight: 1.85 }}>
+            <div style={{ fontSize: cqw(15), lineHeight: 2.1 }}>
               <FieldLine label="Issued to" value={name} />
               <FieldLine label="Affiliation" value={org} />
               <FieldLine label="Interest / Major" value={intro} />
@@ -81,22 +89,22 @@ export default function LicenseInfographic({ card }) {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontWeight: 700, fontSize: 7 }}>LICENSE OF MAKER</div>
-              <div style={{ fontSize: 5.3, marginTop: 3, lineHeight: 1.45 }}>
+              <div style={{ fontWeight: 700, fontSize: cqw(16) }}>LICENSE OF MAKER</div>
+              <div style={{ fontSize: cqw(13), marginTop: cqh(8), lineHeight: 1.7 }}>
                 This is to certify that the person named and described above is permitted to create, build, and imagine freely without limitation.
               </div>
             </div>
 
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontWeight: 700, fontSize: 7 }}>IMPORTANT</div>
-              <div style={{ fontSize: 5.3, lineHeight: 1.45 }}>
+              <div style={{ fontWeight: 700, fontSize: cqw(16), height: cqh(18) }}>IMPORTANT</div>
+              <div style={{ fontSize: cqw(13), lineHeight: 1.7 }}>
                 The holder of this license designed, built, and shipped all works exhibited under this name, unless stated otherwise.
               </div>
             </div>
 
-            <div style={{ alignSelf: 'flex-end', textAlign: 'center', fontSize: 5.5, position: 'relative' }}>
+            <div style={{ alignSelf: 'flex-end', textAlign: 'center', fontSize: cqw(13), position: 'relative' }}>
               .......................................
-              <div style={{ marginTop: 1 }}>Signature of Authorized maker</div>
+              <div style={{ marginTop: cqh(2) }}>Signature of Authorized maker</div>
             </div>
 
             <Stamp />
@@ -150,7 +158,7 @@ const STAR_COL = Array.from({ length: 7 });
 
 function FieldLine({ label, value }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: cqw(8) }}>
       <span>{label}</span>
       <span
         style={{
@@ -158,14 +166,15 @@ function FieldLine({ label, value }) {
           minWidth: 0,
           borderBottom: `1px dotted ${INK}`,
           fontFamily: "'Nanum Pen Script',cursive",
-          fontSize: 11,
-          padding: '0 2px',
+          fontSize: cqw(22),
+          padding: `0 ${cqw(4)}`,
           overflow: 'hidden',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
+          textAlign: 'center',
         }}
       >
-        {value || ' '}
+        {value || ' '}
       </span>
     </div>
   );
@@ -178,13 +187,15 @@ function Stamp() {
       alt=""
       style={{
         position: 'absolute',
-        right: -2,
-        bottom: 24,
-        width: 62,
-        height: 'auto',
-        opacity: 0.55,
+        top: cqh(280),
+        left: cqw(124),
+        width: cqw(302),
+        height: cqh(143),
+        opacity: 0.7,
         mixBlendMode: 'multiply',
-        transform: 'rotate(-8deg)',
+        objectFit: 'cover',
+        objectPosition: '53.2748% 56.3636%',
+        objectViewBox: 'inset(14.9758% 5.8189% 11.5942% 6.6346%)',
         pointerEvents: 'none',
       }}
     />
