@@ -25,7 +25,7 @@ function formatDate(ts) {
 }
 
 export default function LicenseInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id, createdAt } = card;
+  const { name, org, role, template, links, portfolio, personality, favorites, photo, avatarIcon, id, createdAt } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -84,7 +84,7 @@ export default function LicenseInfographic({ card }) {
             <div style={{ fontSize: cqw(15), lineHeight: 2.1 }}>
               <FieldLine label="Issued to" value={name} />
               <FieldLine label="Affiliation" value={org} />
-              <FieldLine label="Interest / Major" value={intro} />
+              <FieldLine label="Role / Title" value={role} />
               <FieldLine label="Date of issue" value={formatDate(createdAt)} />
             </div>
 
