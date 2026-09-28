@@ -15,6 +15,7 @@ export default function Step5Photo() {
     handlePhotoFile,
     avatarIcon,
     selectAvatarIcon,
+    setAiPhoto,
     avatarIconOptions,
     consent,
     setConsent,
@@ -24,6 +25,30 @@ export default function Step5Photo() {
   } = useCard();
   const fileInputRef = useRef(null);
   const [mode, setMode] = useState(avatarIcon ? 'icon' : 'upload');
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const generateAiImage = async () => {
+    if (!aiPrompt.trim() || aiGenerating) return;
+    setAiGenerating(true);
+    setAiError('');
+    try {
+      const res = await fetch('/api/generate-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || '이미지 생성에 실패했습니다.');
+      setAiPhoto(data.image);
+    } catch (err) {
+      console.error('AI 이미지 생성 실패:', err);
+      setAiError(err.message || '이미지 생성 중 오류가 발생했습니다.');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   return (
     <div className={`panel${currentStepName === 'photo' ? ' active' : ''}`}>
@@ -85,9 +110,34 @@ export default function Step5Photo() {
       )}
 
       {mode === 'ai' && (
-        <div className="hint" style={{ marginTop: 0 }}>
-          AI 이미지 생성은 준비 중이에요. 연동되면 여기서 좋아하는 것·특기를 바탕으로 이미지를
-          만들어 드릴게요. 지금은 사진 업로드나 기본 아이콘으로 진행해 주세요.
+        <div>
+          <textarea
+            rows={3}
+            placeholder="예: 안경 쓴 웃는 얼굴의 메이커, 파란 후드티"
+            value={aiPrompt}
+            onChange={(e) => setAiPrompt(e.target.value)}
+          />
+          <div className="hint" style={{ marginTop: 6 }}>
+            원하는 모습을 짧게 설명하면 AI가 프로필 아이콘을 만들어 드려요. 생성에 몇 초 정도 걸립니다.
+          </div>
+          <button
+            className="ghost"
+            style={{ width: '100%', marginTop: 10 }}
+            disabled={!aiPrompt.trim() || aiGenerating}
+            onClick={generateAiImage}
+          >
+            {aiGenerating ? '생성 중...' : '이미지 생성하기'}
+          </button>
+          {aiError && (
+            <div className="hint" style={{ color: 'var(--amber)' }}>
+              {aiError}
+            </div>
+          )}
+          {photoPreview && (
+            <div className="photo-drop" style={{ marginTop: 10 }}>
+              <img src={photoPreview} alt="생성된 프로필 미리보기" />
+            </div>
+          )}
         </div>
       )}
 

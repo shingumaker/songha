@@ -211,6 +211,11 @@ export function CardProvider({ children, mode = 'profile' }) {
     setAvatarIcon(icon);
   }, []);
 
+  const setAiPhoto = useCallback((dataUrl) => {
+    setAvatarIcon(null);
+    setPhotoPreview(dataUrl);
+  }, []);
+
   const resetFlow = useCallback(() => {
     setStep(1);
     setTemplate(mode === 'card' ? 'profile' : null);
@@ -299,6 +304,7 @@ export function CardProvider({ children, mode = 'profile' }) {
       handlePhotoFile,
       avatarIcon,
       selectAvatarIcon,
+      setAiPhoto,
       avatarIconOptions: AVATAR_ICONS,
       consent,
       setConsent,
@@ -339,6 +345,7 @@ export function CardProvider({ children, mode = 'profile' }) {
       handlePhotoFile,
       avatarIcon,
       selectAvatarIcon,
+      setAiPhoto,
       consent,
       issuing,
       statusLine,
