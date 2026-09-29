@@ -11,7 +11,7 @@ import LivePreview from '../components/LivePreview';
 
 function BoothFlow() {
   return (
-    <div className="app">
+    <div className="app profile-page">
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
           <div>
