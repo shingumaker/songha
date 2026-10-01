@@ -271,6 +271,33 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
     // key (saved to localStorage at creation) can successfully save edits.
     const editKey = initialCard?.editKey || `${randomId()}${randomId()}`;
 
+    // If no one-line intro was written, try to have AI fill it in from
+    // whatever profile info exists — best-effort: on failure/timeout we just
+    // save with an empty intro rather than blocking issuance on it.
+    let introText = fields.intro.trim();
+    if (!introText) {
+      try {
+        const introRes = await withTimeout(
+          fetch('/api/generate-intro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: fields.name.trim(),
+              org: fields.org.trim(),
+              role: fields.role.trim(),
+              personality: personality.filter((p) => p.title).map((p) => p.title),
+              favorites: favorites.filter((f) => f.title).map((f) => f.title),
+            }),
+          }),
+          8000,
+        );
+        const introData = await introRes.json();
+        if (introRes.ok && introData?.intro) introText = introData.intro;
+      } catch (err) {
+        console.error('자동 한 줄 소개 생성 실패:', err);
+      }
+    }
+
     const record = {
       id,
       editKey,
@@ -279,7 +306,7 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       name: fields.name.trim(),
       org: fields.org.trim(),
       role: fields.role.trim(),
-      intro: fields.intro.trim(),
+      intro: introText,
       contact: fields.contact.trim(),
       links: links.filter((l) => l && l.trim()),
       portfolio: portfolio.filter((p) => p.title),

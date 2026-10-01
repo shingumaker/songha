@@ -68,7 +68,9 @@ export default function Step2Info() {
         value={fields.intro}
         onChange={(e) => updateField('intro', e.target.value)}
       />
-      <div className="hint">비워두면 발급 시 AI가 자동으로 한 줄을 만들어 드립니다.</div>
+      <div className="hint">
+        비워두면 다음 성격·취향 단계에서 AI로 직접 만들어볼 수 있고, 그래도 비어 있으면 발급 시 자동으로 채워드려요.
+      </div>
 
       <label>
         연락처 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(선택 공개)</span>

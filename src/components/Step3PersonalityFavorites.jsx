@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useCard } from '../context/CardContext';
 
 export default function Step3PersonalityFavorites() {
   const {
     step,
     currentStepName,
+    fields,
+    updateField,
     personality,
     addPersonalityItem,
     updatePersonalityItem,
@@ -14,6 +17,35 @@ export default function Step3PersonalityFavorites() {
     removeFavoriteItem,
     goStep,
   } = useCard();
+  const [introGenerating, setIntroGenerating] = useState(false);
+  const [introError, setIntroError] = useState('');
+
+  const generateIntro = async () => {
+    if (introGenerating) return;
+    setIntroGenerating(true);
+    setIntroError('');
+    try {
+      const res = await fetch('/api/generate-intro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fields.name.trim(),
+          org: fields.org.trim(),
+          role: fields.role.trim(),
+          personality: personality.filter((p) => p.title).map((p) => p.title),
+          favorites: favorites.filter((f) => f.title).map((f) => f.title),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || '문구 생성에 실패했습니다.');
+      updateField('intro', data.intro);
+    } catch (err) {
+      console.error('한 줄 소개 생성 실패:', err);
+      setIntroError(err.message || '생성 중 오류가 발생했습니다.');
+    } finally {
+      setIntroGenerating(false);
+    }
+  };
 
   return (
     <div className={`panel${currentStepName === 'personality' ? ' active' : ''}`}>
@@ -79,6 +111,26 @@ export default function Step3PersonalityFavorites() {
       <button className="add-link" onClick={addFavoriteItem} disabled={favorites.length >= 4}>
         + 좋아하는 것 추가
       </button>
+
+      <label style={{ marginTop: 22 }}>
+        한 줄 소개 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(선택)</span>
+      </label>
+      <div className="hint" style={{ marginTop: 0, marginBottom: 8 }}>
+        이름·성격·관심사를 바탕으로 AI가 소개 문구를 만들어 드려요. 비워두면 발급 시 자동으로 채워집니다.
+      </div>
+      {fields.intro && (
+        <div className="url-box" style={{ maxWidth: 'none', marginTop: 0, marginBottom: 10 }}>
+          {fields.intro}
+        </div>
+      )}
+      <button className="ghost" style={{ width: '100%' }} disabled={introGenerating} onClick={generateIntro}>
+        {introGenerating ? '생성 중...' : fields.intro ? 'AI로 다시 생성하기' : 'AI로 한 줄 생성하기'}
+      </button>
+      {introError && (
+        <div className="hint" style={{ color: 'var(--amber)' }}>
+          {introError}
+        </div>
+      )}
 
       <div className="nav-row">
         <button className="ghost" onClick={() => goStep(step - 1)}>
