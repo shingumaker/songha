@@ -3,6 +3,16 @@ import AvatarDisplay from './AvatarDisplay';
 const WATERMARK_BG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Ccircle cx='45' cy='45' r='38' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.35'/%3E%3Ccircle cx='45' cy='45' r='26' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.35'/%3E%3C/svg%3E";
 
+// Same reasoning as the other ID-card styles: these px values were tuned for
+// the ~350px width this card happens to render at in the create-flow's
+// two-column layout. Converting to cqw/cqh (relative to that 350x218.75
+// reference box) makes it scale correctly at other widths too, e.g. the
+// full-width issued-profile page.
+const CARD_W = 350;
+const CARD_H = CARD_W / 1.6;
+const cqw = (px) => `${(px / CARD_W) * 100}cqw`;
+const cqh = (px) => `${(px / CARD_H) * 100}cqh`;
+
 function formatIdNumber(id) {
   const base = (id || 'guest0').toUpperCase().padEnd(12, '0').repeat(2).slice(0, 12);
   return base.match(/.{1,4}/g).join('  ');
@@ -19,11 +29,11 @@ export default function RepublicInfographic({ card }) {
         style={{
           position: 'relative',
           aspectRatio: '1.6 / 1',
+          containerType: 'size',
           borderRadius: 16,
           overflow: 'hidden',
           background: 'linear-gradient(135deg, #dce9f7 0%, #eef2fb 45%, #f7eef5 100%)',
           boxShadow: '0 18px 40px rgba(30,50,90,0.22)',
-          padding: '16px 18px',
           boxSizing: 'border-box',
         }}
       >
@@ -39,72 +49,73 @@ export default function RepublicInfographic({ card }) {
           }}
         />
 
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ position: 'absolute', inset: 0, boxSizing: 'border-box', padding: `${cqh(16)} ${cqw(18)}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div
+              style={{
+                background: '#c8102e',
+                color: '#fff',
+                fontFamily: "'Space Grotesk',sans-serif",
+                fontWeight: 800,
+                fontSize: cqw(10),
+                letterSpacing: '0.04em',
+                padding: `${cqh(4)} ${cqw(9)}`,
+                borderRadius: 5,
+              }}
+            >
+              EXPO ID
+            </div>
+            <NfcIcon />
+          </div>
+
           <div
             style={{
-              background: '#c8102e',
-              color: '#fff',
               fontFamily: "'Space Grotesk',sans-serif",
               fontWeight: 800,
-              fontSize: 10,
-              letterSpacing: '0.04em',
-              padding: '4px 9px',
-              borderRadius: 5,
+              fontSize: cqw(13),
+              color: '#122b5e',
+              letterSpacing: '0.02em',
+              marginTop: cqh(8),
             }}
           >
-            EXPO ID
-          </div>
-          <NfcIcon />
-        </div>
-
-        <div
-          style={{
-            position: 'relative',
-            fontFamily: "'Space Grotesk',sans-serif",
-            fontWeight: 800,
-            fontSize: 13,
-            color: '#122b5e',
-            letterSpacing: '0.02em',
-            marginTop: 8,
-          }}
-        >
-          REPUBLIC OF CREATIVITY
-          <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 8, fontWeight: 400, color: '#6b7a99', letterSpacing: '0.06em', marginTop: 1 }}>
-            창의공화국 · 공식 시민증
-          </div>
-        </div>
-
-        <div style={{ position: 'relative', display: 'flex', gap: 14, alignItems: 'flex-end', marginTop: 10 }}>
-          <div
-            style={{
-              width: 62,
-              height: 76,
-              borderRadius: 6,
-              border: '1.5px solid rgba(18,43,94,0.35)',
-              overflow: 'hidden',
-              flexShrink: 0,
-              background: '#fff',
-            }}
-          >
-            <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={62} color="#122b5e" />
-          </div>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <Chip />
-            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 15, color: '#122b5e', marginTop: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {name}
-            </div>
-            <div style={{ fontSize: 9, color: '#6b7a99', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {[org, role].filter(Boolean).join(' · ')}
+            REPUBLIC OF CREATIVITY
+            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(8), fontWeight: 400, color: '#6b7a99', letterSpacing: '0.06em', marginTop: cqh(1) }}>
+              창의공화국 · 공식 시민증
             </div>
           </div>
-        </div>
 
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 10 }}>
-          <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: '#122b5e', letterSpacing: '0.06em' }}>
-            {formatIdNumber(id)}
+          <div style={{ display: 'flex', gap: cqw(14), alignItems: 'flex-end', marginTop: cqh(10) }}>
+            <div
+              style={{
+                width: cqw(62),
+                height: cqh(76),
+                borderRadius: 6,
+                border: '1.5px solid rgba(18,43,94,0.35)',
+                overflow: 'hidden',
+                flexShrink: 0,
+                background: '#fff',
+              }}
+            >
+              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={62} color="#122b5e" />
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Chip />
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: cqw(15), color: '#122b5e', marginTop: cqh(6), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {name}
+              </div>
+              <div style={{ fontSize: cqw(9), color: '#6b7a99', marginTop: cqh(1), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {[org, role].filter(Boolean).join(' · ')}
+              </div>
+            </div>
           </div>
-          <Wordmark />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: cqh(10) }}>
+            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(11), color: '#122b5e', letterSpacing: '0.06em' }}>
+              {formatIdNumber(id)}
+            </div>
+            <Wordmark />
+          </div>
         </div>
       </div>
 
@@ -178,7 +189,7 @@ function RLabel({ children }) {
 
 function NfcIcon() {
   return (
-    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#122b5e" strokeWidth="2">
+    <svg width={cqw(16)} height={cqh(16)} viewBox="0 0 24 24" fill="none" stroke="#122b5e" strokeWidth="2">
       <path d="M6 8a6 6 0 0 1 0 8M9 5a10 10 0 0 1 0 14M3 11a2 2 0 0 1 0 2" />
     </svg>
   );
@@ -188,8 +199,8 @@ function Chip() {
   return (
     <div
       style={{
-        width: 30,
-        height: 22,
+        width: cqw(30),
+        height: cqh(22),
         borderRadius: 4,
         background: 'linear-gradient(135deg, #f5d98a, #cf9f4a)',
         border: '1px solid rgba(0,0,0,0.15)',
@@ -206,9 +217,9 @@ function Chip() {
 function Wordmark() {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#c8102e', opacity: 0.85 }} />
-      <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#122b5e', opacity: 0.85, marginLeft: -6 }} />
-      <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 11, color: '#122b5e', marginLeft: 5 }}>
+      <div style={{ width: cqw(16), height: cqh(16), borderRadius: '50%', background: '#c8102e', opacity: 0.85 }} />
+      <div style={{ width: cqw(16), height: cqh(16), borderRadius: '50%', background: '#122b5e', opacity: 0.85, marginLeft: cqw(-6) }} />
+      <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(11), color: '#122b5e', marginLeft: cqw(5) }}>
         PASS
       </span>
     </div>

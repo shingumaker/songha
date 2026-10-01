@@ -34,7 +34,6 @@ const PROFILE_STYLE_META = {
   browser: { label: '브라우저 창형', hint: '겹쳐진 앱 창 콜라주' },
   vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
   neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
-  republic: { label: '공화국 신분증형', hint: '가상국가 여권/신분증 콘셉트' },
 };
 
 const CARD_STYLE_META = {
@@ -42,6 +41,7 @@ const CARD_STYLE_META = {
   techpass: { label: '테크 패스', hint: '다크 홀로그래픽 액세스 카드' },
   license: { label: '라이선스형', hint: '별 테두리 + 필기체 서명란의 빈티지 증서' },
   membership: { label: '멤버십 카드형', hint: '팀 원형 뱃지 + 손글씨 낙서 멤버십 카드' },
+  republic: { label: '공화국 신분증형', hint: '메이커스페이스 공식 멤버' },
 };
 
 const STYLE_META = { ...PROFILE_STYLE_META, ...CARD_STYLE_META };
