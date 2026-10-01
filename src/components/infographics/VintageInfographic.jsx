@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 export default function VintageInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
@@ -64,9 +65,20 @@ export default function VintageInfographic({ card }) {
             <VLabel>{hasPortfolio ? 'PROJECT' : 'LINK'}</VLabel>
             {hasPortfolio ? (
               portfolio.map((p, i) => (
-                <div key={i} style={{ fontSize: 11, color: '#3a3226', marginTop: 3 }}>
-                  {p.title}
-                  {p.desc && ` — ${p.desc}`}
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                  {p.image && (
+                    <img src={p.image} alt="" style={{ width: 20, height: 20, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                  )}
+                  <div style={{ fontSize: 11, color: '#3a3226' }}>
+                    {p.link ? (
+                      <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#3a3226' }}>
+                        {p.title}
+                      </a>
+                    ) : (
+                      p.title
+                    )}
+                    {p.desc && ` — ${p.desc}`}
+                  </div>
                 </div>
               ))
             ) : (

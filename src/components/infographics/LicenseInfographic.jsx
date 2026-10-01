@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 import stampImg from '../../assets/stamp-makerspace.webp';
 
 const INK = '#16325c';
@@ -135,9 +136,20 @@ export default function LicenseInfographic({ card }) {
               <SectionLabel>{hasPortfolio ? '프로젝트' : '링크'}</SectionLabel>
               {hasPortfolio
                 ? portfolio.map((p, i) => (
-                    <div key={i} style={{ fontSize: 12, color: INK, marginTop: 4 }}>
-                      {p.title}
-                      {p.desc && ` — ${p.desc}`}
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                      {p.image && (
+                        <img src={p.image} alt="" style={{ width: 20, height: 20, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                      )}
+                      <div style={{ fontSize: 12, color: INK }}>
+                        {p.link ? (
+                          <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: INK }}>
+                            {p.title}
+                          </a>
+                        ) : (
+                          p.title
+                        )}
+                        {p.desc && ` — ${p.desc}`}
+                      </div>
                     </div>
                   ))
                 : links.map((l, i) => (

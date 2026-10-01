@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useCard } from '../context/CardContext';
 
 export default function Step2Info() {
@@ -16,8 +17,10 @@ export default function Step2Info() {
     addPortfolioItem,
     updatePortfolioItem,
     removePortfolioItem,
+    handlePortfolioImageFile,
     goStep,
   } = useCard();
+  const portfolioFileInputs = useRef({});
 
   const nameValid = fields.name.trim().length > 0;
 
@@ -117,6 +120,36 @@ export default function Step2Info() {
                   value={item.desc}
                   onChange={(e) => updatePortfolioItem(idx, 'desc', e.target.value)}
                 />
+                <input
+                  type="text"
+                  placeholder="링크 (선택, 예: github.com/me/project)"
+                  style={{ marginTop: 8 }}
+                  value={item.link || ''}
+                  onChange={(e) => updatePortfolioItem(idx, 'link', e.target.value)}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                  {item.image && (
+                    <img
+                      src={item.image}
+                      alt=""
+                      style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }}
+                    />
+                  )}
+                  <button
+                    type="button"
+                    className="item-remove"
+                    onClick={() => portfolioFileInputs.current[idx]?.click()}
+                  >
+                    {item.image ? '이미지 변경' : '+ 이미지 첨부'}
+                  </button>
+                  <input
+                    ref={(el) => (portfolioFileInputs.current[idx] = el)}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => handlePortfolioImageFile(idx, e.target.files[0])}
+                  />
+                </div>
                 <button
                   className="item-remove"
                   style={{ marginTop: 8 }}

@@ -173,7 +173,7 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
   }, []);
 
   const addPortfolioItem = useCallback(() => {
-    setPortfolio((prev) => (prev.length >= 2 ? prev : [...prev, { title: '', desc: '' }]));
+    setPortfolio((prev) => (prev.length >= 2 ? prev : [...prev, { title: '', desc: '', link: '', image: '' }]));
   }, []);
 
   const updatePortfolioItem = useCallback((idx, key, value) => {
@@ -182,6 +182,18 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
 
   const removePortfolioItem = useCallback((idx) => {
     setPortfolio((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const handlePortfolioImageFile = useCallback((idx, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      // Smaller/lower-quality than the profile photo — there can be two of
+      // these plus a profile photo in the same Firestore document.
+      const resized = await resizeImageDataUrl(ev.target.result, 240, 0.7);
+      setPortfolio((prev) => prev.map((p, i) => (i === idx ? { ...p, image: resized } : p)));
+    };
+    reader.readAsDataURL(file);
   }, []);
 
   const addPersonalityItem = useCallback(() => {
@@ -327,6 +339,7 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       addPortfolioItem,
       updatePortfolioItem,
       removePortfolioItem,
+      handlePortfolioImageFile,
       personality,
       addPersonalityItem,
       updatePersonalityItem,
@@ -369,6 +382,7 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       addPortfolioItem,
       updatePortfolioItem,
       removePortfolioItem,
+      handlePortfolioImageFile,
       personality,
       addPersonalityItem,
       updatePersonalityItem,

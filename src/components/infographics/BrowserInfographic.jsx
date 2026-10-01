@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 export default function BrowserInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
@@ -47,9 +48,22 @@ export default function BrowserInfographic({ card }) {
           <div style={{ padding: '14px 16px' }}>
             {hasPortfolio ? (
               portfolio.map((p, i) => (
-                <div key={i} style={{ marginBottom: i === portfolio.length - 1 ? 0 : 8 }}>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: '#fff' }}>{p.title}</div>
-                  {p.desc && <div style={{ fontSize: 11, color: '#c9befd', marginTop: 3 }}>{p.desc}</div>}
+                <div key={i} style={{ marginBottom: i === portfolio.length - 1 ? 0 : 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {p.image && (
+                    <img src={p.image} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                  )}
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: '#fff' }}>
+                      {p.link ? (
+                        <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#fff' }}>
+                          {p.title}
+                        </a>
+                      ) : (
+                        p.title
+                      )}
+                    </div>
+                    {p.desc && <div style={{ fontSize: 11, color: '#c9befd', marginTop: 3 }}>{p.desc}</div>}
+                  </div>
                 </div>
               ))
             ) : (

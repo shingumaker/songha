@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 const WATERMARK_BG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Ccircle cx='45' cy='45' r='38' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.35'/%3E%3Ccircle cx='45' cy='45' r='26' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.35'/%3E%3C/svg%3E";
@@ -161,9 +162,20 @@ export default function RepublicInfographic({ card }) {
               <RLabel>ACCESS LOG / {hasPortfolio ? '프로젝트' : '링크'}</RLabel>
               {hasPortfolio
                 ? portfolio.map((p, i) => (
-                    <div key={i} style={{ fontSize: 11, color: '#122b5e', marginTop: 4 }}>
-                      {p.title}
-                      {p.desc && ` — ${p.desc}`}
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                      {p.image && (
+                        <img src={p.image} alt="" style={{ width: 18, height: 18, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                      )}
+                      <div style={{ fontSize: 11, color: '#122b5e' }}>
+                        {p.link ? (
+                          <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#122b5e' }}>
+                            {p.title}
+                          </a>
+                        ) : (
+                          p.title
+                        )}
+                        {p.desc && ` — ${p.desc}`}
+                      </div>
                     </div>
                   ))
                 : links.map((l, i) => (

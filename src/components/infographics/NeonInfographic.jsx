@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 export default function NeonInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
@@ -78,9 +79,22 @@ export default function NeonInfographic({ card }) {
           <div style={{ marginTop: 16, background: 'linear-gradient(90deg,#7ef9ff22,#ff6fd822)', borderRadius: 10, padding: '12px 14px' }}>
             {hasPortfolio ? (
               portfolio.map((p, i) => (
-                <div key={i} style={{ marginBottom: i === portfolio.length - 1 ? 0 : 6 }}>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: '#fff' }}>{p.title}</div>
-                  {p.desc && <div style={{ fontSize: 10.5, color: '#8a8fb0', marginTop: 2 }}>{p.desc}</div>}
+                <div key={i} style={{ marginBottom: i === portfolio.length - 1 ? 0 : 6, display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {p.image && (
+                    <img src={p.image} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                  )}
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 12, color: '#fff' }}>
+                      {p.link ? (
+                        <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#fff' }}>
+                          {p.title}
+                        </a>
+                      ) : (
+                        p.title
+                      )}
+                    </div>
+                    {p.desc && <div style={{ fontSize: 10.5, color: '#8a8fb0', marginTop: 2 }}>{p.desc}</div>}
+                  </div>
                 </div>
               ))
             ) : (

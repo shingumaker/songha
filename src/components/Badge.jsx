@@ -1,4 +1,5 @@
 import AvatarDisplay from './infographics/AvatarDisplay';
+import { normalizeUrl } from './infographics/linkUtils';
 
 export default function Badge({ tag, photoSrc, avatarIcon, name, role, intro, links = [], portfolio = [], cardId }) {
   return (
@@ -24,9 +25,22 @@ export default function Badge({ tag, photoSrc, avatarIcon, name, role, intro, li
       </div>
       <div className="portfolio-preview">
         {portfolio.map((p, i) => (
-          <div className="pf" key={i}>
-            <div className="pf-t">{p.title}</div>
-            <div className="pf-d">{p.desc || ''}</div>
+          <div className="pf" key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {p.image && (
+              <img src={p.image} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+            )}
+            <div>
+              <div className="pf-t">
+                {p.link ? (
+                  <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+                    {p.title}
+                  </a>
+                ) : (
+                  p.title
+                )}
+              </div>
+              <div className="pf-d">{p.desc || ''}</div>
+            </div>
           </div>
         ))}
       </div>

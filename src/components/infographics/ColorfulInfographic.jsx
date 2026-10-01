@@ -1,5 +1,6 @@
 import { darken, lighten } from './colorUtils';
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 const ACCENT = '#e8672c';
 
@@ -111,9 +112,22 @@ export default function ColorfulInfographic({ card }) {
               <Card title="링크 · 프로젝트" accentDark={accentDark}>
                 {hasPortfolio &&
                   portfolio.map((p, i) => (
-                    <div key={i} style={{ background: accentSoft, borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#3a3226' }}>{p.title}</div>
-                      {p.desc && <div style={{ fontSize: 11, color: '#8a7f6c', marginTop: 3 }}>{p.desc}</div>}
+                    <div key={i} style={{ background: accentSoft, borderRadius: 10, padding: '10px 12px', marginBottom: 10, display: 'flex', gap: 8, alignItems: 'center' }}>
+                      {p.image && (
+                        <img src={p.image} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                      )}
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#3a3226' }}>
+                          {p.link ? (
+                            <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#3a3226' }}>
+                              {p.title}
+                            </a>
+                          ) : (
+                            p.title
+                          )}
+                        </div>
+                        {p.desc && <div style={{ fontSize: 11, color: '#8a7f6c', marginTop: 3 }}>{p.desc}</div>}
+                      </div>
                     </div>
                   ))}
                 {hasLink &&

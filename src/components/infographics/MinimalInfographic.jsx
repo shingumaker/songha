@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 export default function MinimalInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
@@ -58,9 +59,22 @@ export default function MinimalInfographic({ card }) {
         <div>
           <SecHeader>PROJECT</SecHeader>
           {portfolio.map((p, i) => (
-            <div key={i} style={{ marginBottom: 10 }}>
-              <div style={{ fontWeight: 700, fontSize: 13 }}>{p.title}</div>
-              {p.desc && <div style={{ fontSize: 12, color: '#6a6a6a', marginTop: 2 }}>{p.desc}</div>}
+            <div key={i} style={{ marginBottom: 10, display: 'flex', gap: 8, alignItems: 'center' }}>
+              {p.image && (
+                <img src={p.image} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+              )}
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13 }}>
+                  {p.link ? (
+                    <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+                      {p.title}
+                    </a>
+                  ) : (
+                    p.title
+                  )}
+                </div>
+                {p.desc && <div style={{ fontSize: 12, color: '#6a6a6a', marginTop: 2 }}>{p.desc}</div>}
+              </div>
             </div>
           ))}
         </div>

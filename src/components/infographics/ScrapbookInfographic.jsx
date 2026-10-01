@@ -1,4 +1,5 @@
 import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
 
 export default function ScrapbookInfographic({ card }) {
   const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
@@ -58,9 +59,23 @@ export default function ScrapbookInfographic({ card }) {
           <Note rotate={-0.6}>
             {hasPortfolio &&
               portfolio.map((p, i) => (
-                <div key={i} style={{ marginBottom: 6 }}>
-                  <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 12, color: '#2c2a22' }}>📌 {p.title}</div>
-                  {p.desc && <div style={{ fontSize: 12, color: '#4a4739' }}>{p.desc}</div>}
+                <div key={i} style={{ marginBottom: 6, display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {p.image && (
+                    <img src={p.image} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                  )}
+                  <div>
+                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 12, color: '#2c2a22' }}>
+                      📌{' '}
+                      {p.link ? (
+                        <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#2c2a22' }}>
+                          {p.title}
+                        </a>
+                      ) : (
+                        p.title
+                      )}
+                    </div>
+                    {p.desc && <div style={{ fontSize: 12, color: '#4a4739' }}>{p.desc}</div>}
+                  </div>
                 </div>
               ))}
             {links?.map((l, i) => (
