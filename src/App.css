@@ -33,13 +33,36 @@ button {
   border-radius: 16px;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
+  grid-template-areas:
+    'header header'
+    'stepper stepper'
+    'steps preview';
   gap: 28px;
   width: 100%;
   max-width: 960px;
 }
+.app-header {
+  grid-area: header;
+}
+.steps {
+  grid-area: stepper;
+}
+.app-steps {
+  grid-area: steps;
+}
+.preview-wrap {
+  grid-area: preview;
+}
 @media (max-width: 760px) {
   .app {
     grid-template-columns: 1fr;
+    /* Show the live preview right under the progress bar on mobile, ahead
+       of the (often long) step form, instead of after it. */
+    grid-template-areas:
+      'header'
+      'stepper'
+      'preview'
+      'steps';
   }
   /* 3-column choice grids (templates, styles, photo-mode tabs) get too
      narrow on mobile, so their labels/descriptions wrap onto many lines and
@@ -62,6 +85,7 @@ button {
 }
 .app.card-page {
   grid-template-columns: 1fr;
+  grid-template-areas: 'preview';
   max-width: 760px;
   width: 100%;
   justify-items: center;

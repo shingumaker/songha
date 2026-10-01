@@ -11,19 +11,19 @@ import LivePreview from '../components/LivePreview';
 function CardDesignFlow() {
   return (
     <div className="app">
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-          <div>
-            <div className="eyebrow">창의융합혁신센터 · EXPO 2026</div>
-            <h1 className="title">ID 카드 디자인 만들기</h1>
-          </div>
-          <Link className="ghost" to="/" style={{ flexShrink: 0, fontSize: 13, padding: '8px 14px' }}>
-            ← 프로필 만들기로
-          </Link>
+      <div className="app-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+        <div>
+          <div className="eyebrow">창의융합혁신센터 · EXPO 2026</div>
+          <h1 className="title">ID 카드 디자인 만들기</h1>
         </div>
+        <Link className="ghost" to="/" style={{ flexShrink: 0, fontSize: 13, padding: '8px 14px' }}>
+          ← 프로필 만들기로
+        </Link>
+      </div>
 
-        <Stepper />
+      <Stepper />
 
+      <div className="app-steps">
         <Step4StyleSelect />
         <Step2Info />
         <Step3PersonalityFavorites />

@@ -20,19 +20,19 @@ function EditFlow({ card }) {
   return (
     <CardProvider mode={mode} initialCard={card}>
       <div className="app profile-page">
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-            <div>
-              <div className="eyebrow">창의융합혁신센터 · EXPO 2026</div>
-              <h1 className="title">프로필 수정하기</h1>
-            </div>
-            <Link className="ghost" to={`/card/${card.id}`} style={{ flexShrink: 0, fontSize: 13, padding: '8px 14px' }}>
-              ← 프로필로 돌아가기
-            </Link>
+        <div className="app-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+          <div>
+            <div className="eyebrow">창의융합혁신센터 · EXPO 2026</div>
+            <h1 className="title">프로필 수정하기</h1>
           </div>
+          <Link className="ghost" to={`/card/${card.id}`} style={{ flexShrink: 0, fontSize: 13, padding: '8px 14px' }}>
+            ← 프로필로 돌아가기
+          </Link>
+        </div>
 
-          <Stepper />
+        <Stepper />
 
+        <div className="app-steps">
           {mode === 'profile' && <Step1Template />}
           <Step4StyleSelect />
           <Step2Info />

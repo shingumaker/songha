@@ -12,19 +12,19 @@ import LivePreview from '../components/LivePreview';
 function BoothFlow() {
   return (
     <div className="app profile-page">
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-          <div>
-            <div className="eyebrow">창의융합혁신센터 · EXPO 2026</div>
-            <h1 className="title">즉석 디지털 프로필 만들기</h1>
-          </div>
-          <Link className="ghost" to="/card-design" style={{ flexShrink: 0, fontSize: 13, padding: '8px 14px' }}>
-            🪪 카드 디자인 만들기
-          </Link>
+      <div className="app-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+        <div>
+          <div className="eyebrow">창의융합혁신센터 · EXPO 2026</div>
+          <h1 className="title">즉석 디지털 프로필 만들기</h1>
         </div>
+        <Link className="ghost" to="/card-design" style={{ flexShrink: 0, fontSize: 13, padding: '8px 14px' }}>
+          🪪 카드 디자인 만들기
+        </Link>
+      </div>
 
-        <Stepper />
+      <Stepper />
 
+      <div className="app-steps">
         <Step1Template />
         <Step4StyleSelect />
         <Step2Info />
