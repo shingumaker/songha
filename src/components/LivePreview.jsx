@@ -39,6 +39,10 @@ export default function LivePreview() {
     photo: photoPreview,
     avatarIcon,
     id: issuedCard?.id,
+    // License/Membership show a "date of issue" field; before the card is
+    // actually issued there's no real timestamp yet, so show today's date as
+    // a live estimate, then switch to the real saved value once issued.
+    createdAt: issuedCard?.createdAt || Date.now(),
   };
 
   const saveAsImage = async () => {

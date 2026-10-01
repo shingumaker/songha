@@ -271,7 +271,7 @@ export function CardProvider({ children, mode = 'profile' }) {
     }
 
     const url = `${window.location.origin}/card/${id}`;
-    setIssuedCard({ id, url });
+    setIssuedCard({ id, url, createdAt: record.createdAt });
     setIssuing(false);
     goStep(stepSequence.length);
   }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys, stepSequence]);
