@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import Booth from './pages/Booth';
 import CardDesignBooth from './pages/CardDesignBooth';
 import CardView from './pages/CardView';
+import Admin from './pages/Admin';
 import './App.css';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
       <Route path="/" element={<Booth />} />
       <Route path="/card-design" element={<CardDesignBooth />} />
       <Route path="/card/:id" element={<CardView />} />
+      <Route path="/admin" element={<Admin />} />
     </Routes>
   );
 }
