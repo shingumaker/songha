@@ -111,7 +111,7 @@ export default function Step5Photo() {
     <div className={`panel${currentStepName === 'photo' ? ' active' : ''}`}>
       <label>프로필 사진</label>
 
-      <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 14 }}>
+      <div className="tpl-grid" style={{ marginBottom: 14 }}>
         {MODES.map((m) => (
           <div
             key={m.key}
@@ -154,7 +154,7 @@ export default function Step5Photo() {
               <div className="hint" style={{ marginBottom: 6 }}>
                 이 사진을 AI로 다른 그림체로 바꿔볼 수도 있어요
               </div>
-              <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 10 }}>
+              <div className="tpl-grid" style={{ marginBottom: 10 }}>
                 {AI_STYLES.map((s) => (
                   <div
                     key={s.key}
@@ -212,7 +212,7 @@ export default function Step5Photo() {
 
       {mode === 'ai' && (
         <div>
-          <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 10 }}>
+          <div className="tpl-grid" style={{ marginBottom: 10 }}>
             {AI_STYLES.map((s) => (
               <div
                 key={s.key}

@@ -9,7 +9,7 @@ export default function Step4StyleSelect() {
       <div className="hint" style={{ marginTop: 0, marginBottom: 14 }}>
         발급될 인포그래픽 카드의 디자인을 골라주세요.
       </div>
-      <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="tpl-grid">
         {styleKeys.map((key) => (
           <div
             key={key}

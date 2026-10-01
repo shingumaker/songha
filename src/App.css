@@ -41,6 +41,13 @@ button {
   .app {
     grid-template-columns: 1fr;
   }
+  /* 3-column choice grids (templates, styles, photo-mode tabs) get too
+     narrow on mobile, so their labels/descriptions wrap onto many lines and
+     each card ends up tall and skinny. Two columns gives each card enough
+     width to stay readable. */
+  .tpl-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
   /* Keep the profile-booth screen (not the ID-card flow) locked to a 9:16
      phone-shaped frame on mobile instead of stretching with page content;
      anything taller than that frame scrolls inside it. */
