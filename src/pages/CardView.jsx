@@ -6,6 +6,7 @@ import { exportCardAsImage } from '../lib/exportCardImage';
 import InfographicRenderer from '../components/infographics/InfographicRenderer';
 
 const LOAD_TIMEOUT_MS = 15000;
+const EDIT_KEY_PREFIX = 'songha_edit_';
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -18,6 +19,7 @@ export default function CardView() {
   const { id } = useParams();
   const [status, setStatus] = useState('loading');
   const [card, setCard] = useState(null);
+  const [canEdit, setCanEdit] = useState(false);
   const [saving, setSaving] = useState(false);
   const cardRef = useRef(null);
 
@@ -25,13 +27,21 @@ export default function CardView() {
     let cancelled = false;
     setStatus('loading');
     setCard(null);
+    setCanEdit(false);
 
     withTimeout(getDoc(doc(db, 'cards', id)), LOAD_TIMEOUT_MS)
       .then((snap) => {
         if (cancelled) return;
         if (snap.exists()) {
-          setCard(snap.data());
+          const data = snap.data();
+          setCard(data);
           setStatus('ready');
+          try {
+            const key = localStorage.getItem(EDIT_KEY_PREFIX + id);
+            if (key && data.editKey && key === data.editKey) setCanEdit(true);
+          } catch {
+            // ignore — edit link just stays hidden
+          }
         } else {
           setStatus('not-found');
         }
@@ -88,6 +98,11 @@ export default function CardView() {
             <button className="ghost" style={{ width: '100%', marginTop: 14 }} onClick={saveAsImage} disabled={saving}>
               {saving ? '저장 중...' : '이미지로 저장'}
             </button>
+            {canEdit && (
+              <Link className="ghost" style={{ display: 'block', width: '100%', marginTop: 10, boxSizing: 'border-box' }} to={`/card/${id}/edit`}>
+                수정하기
+              </Link>
+            )}
           </>
         )}
 

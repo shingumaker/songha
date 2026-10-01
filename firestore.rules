@@ -4,7 +4,13 @@ service cloud.firestore {
     match /cards/{cardId} {
       allow read: if true;
       allow create: if true;
-      allow update, delete: if false;
+      // Edits are allowed only if the incoming write echoes back the same
+      // editKey already stored on the document (set once at creation and
+      // kept in the creator's browser localStorage) — not real auth, but
+      // enough to stop casual/accidental overwrites of someone else's card.
+      allow update: if request.resource.data.id == resource.data.id
+                    && request.resource.data.editKey == resource.data.editKey;
+      allow delete: if false;
     }
   }
 }

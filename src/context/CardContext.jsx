@@ -118,20 +118,30 @@ const initialFields = {
   contact: '',
 };
 
-export function CardProvider({ children, mode = 'profile' }) {
+export function CardProvider({ children, mode = 'profile', initialCard = null }) {
   const styleKeys = mode === 'card' ? CARD_STYLE_KEYS : PROFILE_STYLE_KEYS;
   const stepSequence = STEP_SEQUENCES[mode] || STEP_SEQUENCES.profile;
   const [step, setStep] = useState(1);
-  const [template, setTemplate] = useState(mode === 'card' ? 'profile' : null);
-  const [fields, setFields] = useState(initialFields);
-  const [links, setLinks] = useState(['']);
-  const [portfolio, setPortfolio] = useState([]);
-  const [personality, setPersonality] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const [style, setStyle] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
-  const [avatarIcon, setAvatarIcon] = useState(null);
-  const [consent, setConsent] = useState(false);
+  const [template, setTemplate] = useState(initialCard?.template || (mode === 'card' ? 'profile' : null));
+  const [fields, setFields] = useState(() =>
+    initialCard
+      ? {
+          name: initialCard.name || '',
+          org: initialCard.org || '',
+          role: initialCard.role || '',
+          intro: initialCard.intro || '',
+          contact: initialCard.contact || '',
+        }
+      : initialFields,
+  );
+  const [links, setLinks] = useState(() => (initialCard?.links?.length ? initialCard.links : ['']));
+  const [portfolio, setPortfolio] = useState(() => initialCard?.portfolio || []);
+  const [personality, setPersonality] = useState(() => initialCard?.personality || []);
+  const [favorites, setFavorites] = useState(() => initialCard?.favorites || []);
+  const [style, setStyle] = useState(initialCard?.style || null);
+  const [photoPreview, setPhotoPreview] = useState(initialCard?.photo || null);
+  const [avatarIcon, setAvatarIcon] = useState(initialCard?.avatarIcon || null);
+  const [consent, setConsent] = useState(!!initialCard);
   const [issuing, setIssuing] = useState(false);
   const [statusLine, setStatusLine] = useState('');
   const [issuedCard, setIssuedCard] = useState(null);
@@ -240,12 +250,18 @@ export function CardProvider({ children, mode = 'profile' }) {
 
   const issueCard = useCallback(async () => {
     setIssuing(true);
-    setStatusLine('카드 저장 중...');
-    const id = randomId();
+    setStatusLine(initialCard ? '수정 저장 중...' : '카드 저장 중...');
+    const id = initialCard?.id || randomId();
     const finalStyle = style || pickRandomStyle(styleKeys);
+    // Edits are authenticated by echoing back the same editKey the card was
+    // created with — Firestore rules reject an update whose editKey doesn't
+    // match what's already stored, so only a browser that has this card's
+    // key (saved to localStorage at creation) can successfully save edits.
+    const editKey = initialCard?.editKey || `${randomId()}${randomId()}`;
 
     const record = {
       id,
+      editKey,
       template,
       style: finalStyle,
       name: fields.name.trim(),
@@ -257,7 +273,7 @@ export function CardProvider({ children, mode = 'profile' }) {
       portfolio: portfolio.filter((p) => p.title),
       personality: personality.filter((p) => p.title),
       favorites: favorites.filter((f) => f.title),
-      createdAt: Date.now(),
+      createdAt: initialCard?.createdAt || Date.now(),
     };
     if (photoPreview) record.photo = photoPreview;
     else if (avatarIcon) record.avatarIcon = avatarIcon;
@@ -265,6 +281,13 @@ export function CardProvider({ children, mode = 'profile' }) {
     try {
       await withTimeout(setDoc(doc(collection(db, 'cards'), id), record), SAVE_TIMEOUT_MS);
       setStatusLine('저장 완료');
+      if (!initialCard) {
+        try {
+          localStorage.setItem(`songha_edit_${id}`, editKey);
+        } catch {
+          // ignore — worst case this browser just can't edit it later
+        }
+      }
     } catch (err) {
       console.error('카드 저장 실패:', err);
       setStatusLine('데모 모드로 진행 중 (저장 없이 미리보기만 제공)');
@@ -274,7 +297,7 @@ export function CardProvider({ children, mode = 'profile' }) {
     setIssuedCard({ id, url, createdAt: record.createdAt });
     setIssuing(false);
     goStep(stepSequence.length);
-  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys, stepSequence]);
+  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys, stepSequence, initialCard]);
 
   const value = useMemo(
     () => ({
@@ -319,6 +342,7 @@ export function CardProvider({ children, mode = 'profile' }) {
       issuedCard,
       issueCard,
       resetFlow,
+      isEditMode: !!initialCard,
     }),
     [
       step,
@@ -358,6 +382,7 @@ export function CardProvider({ children, mode = 'profile' }) {
       issuedCard,
       issueCard,
       resetFlow,
+      initialCard,
     ],
   );
 

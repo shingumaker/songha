@@ -31,6 +31,7 @@ export default function Step5Photo() {
     fields,
     personality,
     favorites,
+    isEditMode,
   } = useCard();
   const fileInputRef = useRef(null);
   const [mode, setMode] = useState(avatarIcon ? 'icon' : 'upload');
@@ -280,7 +281,7 @@ export default function Step5Photo() {
           이전
         </button>
         <button className="primary" disabled={!consent || issuing} onClick={issueCard}>
-          {issuing ? '발급 중...' : '카드 발급하기'}
+          {issuing ? (isEditMode ? '저장 중...' : '발급 중...') : isEditMode ? '수정 저장하기' : '카드 발급하기'}
         </button>
       </div>
     </div>
