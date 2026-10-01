@@ -2,6 +2,16 @@ import AvatarDisplay from './AvatarDisplay';
 
 const ACCENT = '#e6b45a';
 
+// Same reasoning as CivicPassInfographic: these px values were tuned for the
+// ~350px width this card happens to render at in the create-flow's two-column
+// layout. Converting to cqw/cqh (relative to that 350x218.75 reference box)
+// makes the card scale correctly at other widths too, e.g. the full-width
+// issued-profile page, instead of staying pinned at its original small size.
+const CARD_W = 350;
+const CARD_H = CARD_W / 1.6;
+const cqw = (px) => `${(px / CARD_W) * 100}cqw`;
+const cqh = (px) => `${(px / CARD_H) * 100}cqh`;
+
 function formatIdNumber(id) {
   const base = (id || 'guest0').toUpperCase().padEnd(6, '0').repeat(2).slice(0, 12);
   return base.match(/.{1,4}/g).join('-');
@@ -33,6 +43,7 @@ export default function TechPassInfographic({ card }) {
       <div
         style={{
           aspectRatio: '1.6 / 1',
+          containerType: 'size',
           borderRadius: 0,
           overflow: 'hidden',
           position: 'relative',
@@ -55,7 +66,7 @@ export default function TechPassInfographic({ card }) {
             top: 0,
             bottom: 0,
             left: 0,
-            width: 4,
+            width: cqw(4),
             background: 'linear-gradient(180deg, #e6b45a, #7a4dd1, #2fb8c8, #e6b45a)',
           }}
         />
@@ -65,19 +76,19 @@ export default function TechPassInfographic({ card }) {
             position: 'relative',
             height: '100%',
             boxSizing: 'border-box',
-            padding: '10px 12px 10px 14px',
+            padding: `${cqh(10)} ${cqw(12)} ${cqh(10)} ${cqw(14)}`,
             display: 'flex',
             flexDirection: 'column',
-            gap: 6,
+            gap: cqh(6),
             color: '#e8e4da',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(5) }}>
               <div
                 style={{
-                  width: 14,
-                  height: 14,
+                  width: cqw(14),
+                  height: cqh(14),
                   borderRadius: 0,
                   background: ACCENT,
                   display: 'flex',
@@ -85,27 +96,27 @@ export default function TechPassInfographic({ card }) {
                   justifyContent: 'center',
                   fontFamily: "'Space Grotesk',sans-serif",
                   fontWeight: 800,
-                  fontSize: 8,
+                  fontSize: cqw(8),
                   color: '#14171c',
                 }}
               >
                 E
               </div>
-              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 8, letterSpacing: '0.03em' }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: cqw(8), letterSpacing: '0.03em' }}>
                 EXPO ACCESS
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontFamily: "'IBM Plex Mono',monospace", fontSize: 6, color: ACCENT, letterSpacing: '0.05em' }}>
-              <span style={{ width: 4, height: 4, borderRadius: '50%', background: ACCENT, display: 'inline-block' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(4), fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(6), color: ACCENT, letterSpacing: '0.05em' }}>
+              <span style={{ width: cqw(4), height: cqh(4), borderRadius: '50%', background: ACCENT, display: 'inline-block' }} />
               LEVEL 2 · ACTIVE
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexGrow: 1 }}>
+          <div style={{ display: 'flex', gap: cqw(10), alignItems: 'center', flexGrow: 1 }}>
             <div
               style={{
-                width: 92,
-                height: 108,
+                width: cqw(92),
+                height: cqh(108),
                 borderRadius: 0,
                 border: '1.5px solid rgba(232,228,218,0.25)',
                 background: 'rgba(255,255,255,0.04)',
@@ -117,15 +128,15 @@ export default function TechPassInfographic({ card }) {
             </div>
 
             <div style={{ flexGrow: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 15, color: '#fff', lineHeight: 1.25 }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(15), color: '#fff', lineHeight: 1.25 }}>
                 {name}
               </div>
-              <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 15, color: ACCENT, marginTop: 3, letterSpacing: '0.01em', lineHeight: 1.25 }}>
-                {[org, role].filter(Boolean).join(' · ') || ' '}
+              <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(15), color: ACCENT, marginTop: cqh(3), letterSpacing: '0.01em', lineHeight: 1.25 }}>
+                {[org, role].filter(Boolean).join(' · ') || ' '}
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,4px)', gridTemplateRows: 'repeat(5,4px)', gap: 1, flexShrink: 0 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(5,${cqw(4)})`, gridTemplateRows: `repeat(5,${cqh(4)})`, gap: `${cqh(1)} ${cqw(1)}`, flexShrink: 0 }}>
               {QR_ROWS.flat().map((on, i) => (
                 <div key={i} style={{ background: on ? '#e8e4da' : 'transparent' }} />
               ))}
@@ -137,20 +148,20 @@ export default function TechPassInfographic({ card }) {
               display: 'grid',
               gridTemplateColumns: '1fr auto 1fr',
               alignItems: 'end',
-              columnGap: 8,
+              columnGap: cqw(8),
               borderTop: '1px solid rgba(232,228,218,0.15)',
-              paddingTop: 6,
+              paddingTop: cqh(6),
             }}
           >
-            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 7, color: 'rgba(232,228,218,0.75)', letterSpacing: '0.04em', justifySelf: 'start' }}>
+            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(7), color: 'rgba(232,228,218,0.75)', letterSpacing: '0.04em', justifySelf: 'start' }}>
               ID · {formatIdNumber(id)}
             </div>
-            <div style={{ justifySelf: 'center', display: 'flex', alignItems: 'flex-end', height: 12 }}>
+            <div style={{ justifySelf: 'center', display: 'flex', alignItems: 'flex-end', height: cqh(12) }}>
               {BAR_PATTERN.map(([w, mr], i) => (
-                <div key={i} style={{ width: w, height: 12, background: '#fff', marginRight: mr }} />
+                <div key={i} style={{ width: cqw(w), height: cqh(12), background: '#fff', marginRight: cqw(mr) }} />
               ))}
             </div>
-            <div style={{ justifySelf: 'end', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 7, color: 'rgba(232,228,218,0.5)', letterSpacing: '0.06em' }}>
+            <div style={{ justifySelf: 'end', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: cqw(7), color: 'rgba(232,228,218,0.5)', letterSpacing: '0.06em' }}>
               EXPO 2026
             </div>
           </div>

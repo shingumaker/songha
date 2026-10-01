@@ -5,6 +5,17 @@ const ACCENT = '#0b6b4f';
 const NAVY = '#122b5e';
 const BURGUNDY = '#6b1f2f';
 
+// The card frame below was originally hand-tuned in fixed px at the ~350px
+// width it happens to render at inside the create-flow's two-column layout.
+// Converting those px values to container-query units (relative to that same
+// 350x218.75 reference box) makes it scale correctly everywhere else too —
+// e.g. the full-width issued-profile page — instead of staying pinned at its
+// original small size inside an otherwise much larger card frame.
+const CARD_W = 350;
+const CARD_H = CARD_W / 1.6;
+const cqw = (px) => `${(px / CARD_W) * 100}cqw`;
+const cqh = (px) => `${(px / CARD_H) * 100}cqh`;
+
 function formatIdNumber(id) {
   const base = (id || 'guest0').toUpperCase().padEnd(6, '0').repeat(2).slice(0, 12);
   return base.match(/.{1,4}/g).join('  ');
@@ -30,6 +41,7 @@ export default function CivicPassInfographic({ card }) {
       <div
         style={{
           aspectRatio: '1.6 / 1',
+          containerType: 'size',
           borderRadius: 0,
           overflow: 'hidden',
           position: 'relative',
@@ -54,7 +66,7 @@ export default function CivicPassInfographic({ card }) {
             transform: 'translate(-50%,-50%) rotate(-10deg)',
             fontFamily: "'Space Grotesk',sans-serif",
             fontWeight: 800,
-            fontSize: 30,
+            fontSize: cqw(30),
             color: ACCENT,
             opacity: 0.06,
             whiteSpace: 'nowrap',
@@ -69,7 +81,7 @@ export default function CivicPassInfographic({ card }) {
             top: 0,
             left: 0,
             right: 0,
-            height: 46,
+            height: cqh(46),
             background: `linear-gradient(120deg, ${accentLight} 0%, ${ACCENT} 55%, ${accentDark} 100%)`,
             borderRadius: 0,
           }}
@@ -77,10 +89,10 @@ export default function CivicPassInfographic({ card }) {
         <div
           style={{
             position: 'absolute',
-            top: 44,
+            top: cqh(44),
             left: 0,
             right: 0,
-            height: 2,
+            height: cqh(2),
             background: `linear-gradient(90deg, ${BURGUNDY} 0%, #a8425a 40%, transparent 85%)`,
           }}
         />
@@ -90,31 +102,31 @@ export default function CivicPassInfographic({ card }) {
             position: 'relative',
             height: '100%',
             boxSizing: 'border-box',
-            padding: '10px 12px',
+            padding: `${cqh(10)} ${cqw(12)}`,
             display: 'flex',
             flexDirection: 'column',
-            gap: 6,
+            gap: cqh(6),
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div style={{ color: '#fff', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 8, letterSpacing: '0.04em' }}>
+            <div style={{ color: '#fff', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(8), letterSpacing: '0.04em' }}>
               2026 SHINGU EXPO.
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 10, color: '#fff', letterSpacing: '0.01em' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(5) }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(10), color: '#fff', letterSpacing: '0.01em' }}>
                 REPUBLIC OF CREATIVITY SHINGU
               </div>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+              <svg width={cqw(12)} height={cqh(12)} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
                 <path d="M6 8a6 6 0 0 1 0 8M9 5a10 10 0 0 1 0 14M3 11a2 2 0 0 1 0 2" />
               </svg>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexGrow: 1 }}>
+          <div style={{ display: 'flex', gap: cqw(10), alignItems: 'center', flexGrow: 1 }}>
             <div
               style={{
-                width: 92,
-                height: 108,
+                width: cqw(92),
+                height: cqh(108),
                 borderRadius: 0,
                 border: `1.5px solid ${NAVY}59`,
                 background: '#fff',
@@ -126,28 +138,28 @@ export default function CivicPassInfographic({ card }) {
             </div>
 
             <div style={{ flexGrow: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 15, color: NAVY, lineHeight: 1.25 }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: cqw(15), color: NAVY, lineHeight: 1.25 }}>
                 {name}
               </div>
-              <div style={{ fontSize: 15, color: '#6b7a99', marginTop: 3, lineHeight: 1.25 }}>
-                {[org, role].filter(Boolean).join(' · ') || ' '}
+              <div style={{ fontSize: cqw(15), color: '#6b7a99', marginTop: cqh(3), lineHeight: 1.25 }}>
+                {[org, role].filter(Boolean).join(' · ') || ' '}
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'end', columnGap: 8 }}>
-            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 8, color: NAVY, letterSpacing: '0.05em', justifySelf: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'end', columnGap: cqw(8) }}>
+            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(8), color: NAVY, letterSpacing: '0.05em', justifySelf: 'start' }}>
               {formatIdNumber(id)}
             </div>
-            <div style={{ justifySelf: 'center', display: 'flex', alignItems: 'flex-end', height: 12 }}>
+            <div style={{ justifySelf: 'center', display: 'flex', alignItems: 'flex-end', height: cqh(12) }}>
               {BAR_PATTERN.map(([w, mr], i) => (
-                <div key={i} style={{ width: w, height: 12, background: NAVY, marginRight: mr }} />
+                <div key={i} style={{ width: cqw(w), height: cqh(12), background: NAVY, marginRight: cqw(mr) }} />
               ))}
             </div>
             <div style={{ justifySelf: 'end', display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#c8102e', opacity: 0.85 }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: NAVY, opacity: 0.85, marginLeft: -4 }} />
-              <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: 8, color: NAVY, marginLeft: 4 }}>
+              <div style={{ width: cqw(10), height: cqh(10), borderRadius: '50%', background: '#c8102e', opacity: 0.85 }} />
+              <div style={{ width: cqw(10), height: cqh(10), borderRadius: '50%', background: NAVY, opacity: 0.85, marginLeft: cqw(-4) }} />
+              <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(8), color: NAVY, marginLeft: cqw(4) }}>
                 PASS
               </span>
             </div>
