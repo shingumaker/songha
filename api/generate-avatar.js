@@ -1,3 +1,10 @@
+function dataUrlToBlob(dataUrl) {
+  const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl || '');
+  if (!match) return null;
+  const [, mime, b64] = match;
+  return new Blob([Buffer.from(b64, 'base64')], { type: mime });
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -12,8 +19,9 @@ export default async function handler(req, res) {
   }
 
   const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt.trim() : '';
-  if (!prompt) {
-    res.status(400).json({ error: '설명(prompt)을 입력해 주세요.' });
+  const inputImage = typeof req.body?.image === 'string' ? req.body.image : '';
+  if (!prompt && !inputImage) {
+    res.status(400).json({ error: '설명(prompt)을 입력하거나 사진을 첨부해 주세요.' });
     return;
   }
 
@@ -36,28 +44,52 @@ export default async function handler(req, res) {
 
   const fullPrompt =
     `${STYLE_PROMPTS[style]} ` +
-    'Simple clean background, single person centered, head-and-shoulders, no text, no watermark, no logo. ' +
-    `Subject: ${prompt.slice(0, 300)}` +
+    (inputImage
+      ? 'Keep the same person, face, and pose as shown in the provided photo — just restyle the artwork and ' +
+        'rendering, do not change their identity or composition. '
+      : 'Simple clean background, single person centered, head-and-shoulders, no text, no watermark, no logo. ') +
+    (prompt ? `Subject: ${prompt.slice(0, 300)}` : '') +
     (context
       ? ` Subtly let this person's profile inform the mood, styling, and expression (do not render any text, ` +
         `props, or literal symbols for it): ${context}.`
       : '');
 
   try {
-    const openaiRes = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: fullPrompt,
-        size: '1024x1024',
-        quality: 'low',
-        n: 1,
-      }),
-    });
+    let openaiRes;
+    if (inputImage) {
+      const blob = dataUrlToBlob(inputImage);
+      if (!blob) {
+        res.status(400).json({ error: '사진 형식을 읽을 수 없습니다.' });
+        return;
+      }
+      const form = new FormData();
+      form.append('model', 'gpt-image-1');
+      form.append('image', blob, 'photo.png');
+      form.append('prompt', fullPrompt);
+      form.append('size', '1024x1024');
+      form.append('quality', 'low');
+      form.append('n', '1');
+      openaiRes = await fetch('https://api.openai.com/v1/images/edits', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: form,
+      });
+    } else {
+      openaiRes = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-image-1',
+          prompt: fullPrompt,
+          size: '1024x1024',
+          quality: 'low',
+          n: 1,
+        }),
+      });
+    }
 
     if (!openaiRes.ok) {
       const errText = await openaiRes.text();

@@ -38,6 +38,9 @@ export default function Step5Photo() {
   const [aiStyle, setAiStyle] = useState('webtoon');
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [uploadStyle, setUploadStyle] = useState('webtoon');
+  const [stylizing, setStylizing] = useState(false);
+  const [stylizeError, setStylizeError] = useState('');
 
   const profileContext = [
     fields?.name?.trim() && `이름: ${fields.name.trim()}`,
@@ -65,6 +68,27 @@ export default function Step5Photo() {
       setAiError(err.message || '이미지 생성 중 오류가 발생했습니다.');
     } finally {
       setAiGenerating(false);
+    }
+  };
+
+  const stylizeUploadedPhoto = async () => {
+    if (!photoPreview || stylizing) return;
+    setStylizing(true);
+    setStylizeError('');
+    try {
+      const res = await fetch('/api/generate-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ style: uploadStyle, context: profileContext, image: photoPreview }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || '이미지 변환에 실패했습니다.');
+      setAiPhoto(data.image);
+    } catch (err) {
+      console.error('AI 그림체 변환 실패:', err);
+      setStylizeError(err.message || '변환 중 오류가 발생했습니다.');
+    } finally {
+      setStylizing(false);
     }
   };
 
@@ -109,6 +133,41 @@ export default function Step5Photo() {
             style={{ display: 'none' }}
             onChange={(e) => handlePhotoFile(e.target.files[0])}
           />
+
+          {photoPreview && (
+            <div style={{ marginTop: 12 }}>
+              <div className="hint" style={{ marginBottom: 6 }}>
+                이 사진을 AI로 다른 그림체로 바꿔볼 수도 있어요
+              </div>
+              <div className="tpl-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 10 }}>
+                {AI_STYLES.map((s) => (
+                  <div
+                    key={s.key}
+                    className={`tpl-card${uploadStyle === s.key ? ' selected' : ''}`}
+                    style={{ padding: '8px 6px', textAlign: 'center' }}
+                    onClick={() => setUploadStyle(s.key)}
+                  >
+                    <div className="n" style={{ fontSize: 11 }}>
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                className="ghost"
+                style={{ width: '100%' }}
+                disabled={stylizing}
+                onClick={stylizeUploadedPhoto}
+              >
+                {stylizing ? '변환 중...' : '이 그림체로 변환하기'}
+              </button>
+              {stylizeError && (
+                <div className="hint" style={{ color: 'var(--amber)' }}>
+                  {stylizeError}
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
 
