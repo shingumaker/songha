@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCard } from '../context/CardContext';
 
 const MODES = [
@@ -41,6 +41,19 @@ export default function Step5Photo() {
   const [uploadStyle, setUploadStyle] = useState('webtoon');
   const [stylizing, setStylizing] = useState(false);
   const [stylizeError, setStylizeError] = useState('');
+  const [originalPhoto, setOriginalPhoto] = useState(null);
+  const skipOriginalCaptureRef = useRef(false);
+
+  // Track the photo as originally uploaded (before any AI restyle), so the
+  // user can switch back to it after trying a style instead of losing it.
+  useEffect(() => {
+    if (skipOriginalCaptureRef.current) {
+      skipOriginalCaptureRef.current = false;
+      return;
+    }
+    if (mode === 'upload') setOriginalPhoto(photoPreview);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photoPreview]);
 
   const profileContext = [
     fields?.name?.trim() && `이름: ${fields.name.trim()}`,
@@ -83,6 +96,7 @@ export default function Step5Photo() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || '이미지 변환에 실패했습니다.');
+      skipOriginalCaptureRef.current = true;
       setAiPhoto(data.image);
     } catch (err) {
       console.error('AI 그림체 변환 실패:', err);
@@ -165,6 +179,15 @@ export default function Step5Photo() {
                 <div className="hint" style={{ color: 'var(--amber)' }}>
                   {stylizeError}
                 </div>
+              )}
+              {originalPhoto && originalPhoto !== photoPreview && (
+                <button
+                  className="ghost"
+                  style={{ width: '100%', marginTop: 8 }}
+                  onClick={() => setAiPhoto(originalPhoto)}
+                >
+                  원본 사진 그대로 사용하기
+                </button>
               )}
             </div>
           )}

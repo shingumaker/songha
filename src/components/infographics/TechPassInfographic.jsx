@@ -131,8 +131,11 @@ export default function TechPassInfographic({ card }) {
               <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(15), color: '#fff', lineHeight: 1.25 }}>
                 {name}
               </div>
-              <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(15), color: ACCENT, marginTop: cqh(3), letterSpacing: '0.01em', lineHeight: 1.25 }}>
-                {[org, role].filter(Boolean).join(' · ') || ' '}
+              <div style={{ fontFamily: "'Noto Sans KR',sans-serif", fontWeight: 700, fontSize: cqw(13), color: ACCENT, marginTop: cqh(3), lineHeight: 1.3 }}>
+                {org || ' '}
+              </div>
+              <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(11), color: 'rgba(232,228,218,0.65)', marginTop: cqh(1), letterSpacing: '0.01em', lineHeight: 1.3 }}>
+                {role || ' '}
               </div>
             </div>
 
