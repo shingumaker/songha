@@ -51,7 +51,7 @@ const CARD_STYLE_KEYS = Object.keys(CARD_STYLE_META);
 const STYLE_KEYS = Object.keys(STYLE_META);
 
 const STEP_SEQUENCES = {
-  profile: ['template', 'info', 'personality', 'style', 'photo', 'done'],
+  profile: ['template', 'style', 'info', 'personality', 'photo', 'done'],
   card: ['style', 'info', 'personality', 'photo', 'done'],
 };
 

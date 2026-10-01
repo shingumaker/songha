@@ -26,9 +26,9 @@ function BoothFlow() {
         <Stepper />
 
         <Step1Template />
+        <Step4StyleSelect />
         <Step2Info />
         <Step3PersonalityFavorites />
-        <Step4StyleSelect />
         <Step5Photo />
         <Step6Done />
       </div>
