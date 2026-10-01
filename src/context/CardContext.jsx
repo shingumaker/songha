@@ -290,6 +290,14 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       }
     } catch (err) {
       console.error('카드 저장 실패:', err);
+      if (initialCard) {
+        // Unlike a brand-new card, silently "succeeding" here would show a
+        // fake success screen while the edit was actually lost — surface the
+        // failure instead of advancing past it.
+        setStatusLine('수정 내용을 저장하지 못했습니다. 네트워크를 확인하고 다시 시도해 주세요.');
+        setIssuing(false);
+        return;
+      }
       setStatusLine('데모 모드로 진행 중 (저장 없이 미리보기만 제공)');
     }
 
