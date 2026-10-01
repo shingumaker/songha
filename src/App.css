@@ -98,28 +98,33 @@ h1.title {
 
 /* ---- stepper ---- */
 .steps {
-  display: flex;
-  gap: 6px;
   margin-bottom: 24px;
 }
-.step-pill {
+.steps-track {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 9px;
+}
+.step-dot {
   flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.step-dot.done {
+  background: var(--line-paper, #3a4152);
+}
+.step-dot.active {
+  background: var(--lime);
+}
+.steps-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
-  text-align: center;
-  padding: 8px 4px;
-  border: 0.5px solid var(--line);
-  border-radius: 6px;
+  letter-spacing: 0.04em;
   color: var(--slate);
 }
-.step-pill.active {
-  border-color: var(--lime);
+.steps-label .n {
   color: var(--lime);
-  background: rgba(200, 255, 77, 0.06);
-}
-.step-pill.done {
-  color: var(--paper);
-  border-color: var(--line-paper, #3a4152);
 }
 
 .panel {
