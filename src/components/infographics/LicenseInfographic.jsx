@@ -204,10 +204,10 @@ function Stamp() {
       alt=""
       style={{
         position: 'absolute',
-        top: cqh(280),
-        left: cqw(124),
-        width: cqw(302),
-        height: cqh(143),
+        top: cqh(287),
+        left: cqw(139),
+        width: cqw(272),
+        height: cqh(129),
         opacity: 0.7,
         mixBlendMode: 'multiply',
         objectFit: 'cover',
