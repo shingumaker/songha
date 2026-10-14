@@ -138,6 +138,8 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
   const [portfolio, setPortfolio] = useState(() => initialCard?.portfolio || []);
   const [personality, setPersonality] = useState(() => initialCard?.personality || []);
   const [favorites, setFavorites] = useState(() => initialCard?.favorites || []);
+  const [certifications, setCertifications] = useState(() => initialCard?.certifications || []);
+  const [skills, setSkills] = useState(() => initialCard?.skills || []);
   const [style, setStyle] = useState(initialCard?.style || null);
   const [photoPreview, setPhotoPreview] = useState(initialCard?.photo || null);
   const [avatarIcon, setAvatarIcon] = useState(initialCard?.avatarIcon || null);
@@ -220,6 +222,30 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
     setFavorites((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
+  const addCertificationItem = useCallback(() => {
+    setCertifications((prev) => (prev.length >= 3 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updateCertificationItem = useCallback((idx, key, value) => {
+    setCertifications((prev) => prev.map((c, i) => (i === idx ? { ...c, [key]: value } : c)));
+  }, []);
+
+  const removeCertificationItem = useCallback((idx) => {
+    setCertifications((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const addSkillItem = useCallback(() => {
+    setSkills((prev) => (prev.length >= 6 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updateSkillItem = useCallback((idx, key, value) => {
+    setSkills((prev) => prev.map((s, i) => (i === idx ? { ...s, [key]: value } : s)));
+  }, []);
+
+  const removeSkillItem = useCallback((idx) => {
+    setSkills((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
   const selectStyle = useCallback((s) => {
     setStyle(s === 'random' ? pickRandomStyle(styleKeys) : s);
   }, [styleKeys]);
@@ -252,6 +278,8 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
     setPortfolio([]);
     setPersonality([]);
     setFavorites([]);
+    setCertifications([]);
+    setSkills([]);
     setStyle(null);
     setPhotoPreview(null);
     setAvatarIcon(null);
@@ -312,6 +340,8 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       portfolio: portfolio.filter((p) => p.title),
       personality: personality.filter((p) => p.title),
       favorites: favorites.filter((f) => f.title),
+      certifications: certifications.filter((c) => c.title),
+      skills: skills.filter((s) => s.title),
       createdAt: initialCard?.createdAt || Date.now(),
     };
     if (photoPreview) record.photo = photoPreview;
@@ -344,7 +374,7 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
     setIssuedCard({ id, url, createdAt: record.createdAt });
     setIssuing(false);
     goStep(stepSequence.length);
-  }, [template, style, fields, links, portfolio, personality, favorites, photoPreview, avatarIcon, goStep, styleKeys, stepSequence, initialCard]);
+  }, [template, style, fields, links, portfolio, personality, favorites, certifications, skills, photoPreview, avatarIcon, goStep, styleKeys, stepSequence, initialCard]);
 
   const value = useMemo(
     () => ({
@@ -375,6 +405,14 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       addFavoriteItem,
       updateFavoriteItem,
       removeFavoriteItem,
+      certifications,
+      addCertificationItem,
+      updateCertificationItem,
+      removeCertificationItem,
+      skills,
+      addSkillItem,
+      updateSkillItem,
+      removeSkillItem,
       style,
       selectStyle,
       photoPreview,
@@ -418,6 +456,14 @@ export function CardProvider({ children, mode = 'profile', initialCard = null })
       addFavoriteItem,
       updateFavoriteItem,
       removeFavoriteItem,
+      certifications,
+      addCertificationItem,
+      updateCertificationItem,
+      removeCertificationItem,
+      skills,
+      addSkillItem,
+      updateSkillItem,
+      removeSkillItem,
       style,
       selectStyle,
       photoPreview,

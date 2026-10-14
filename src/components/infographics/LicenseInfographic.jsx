@@ -26,7 +26,7 @@ function formatDate(ts) {
 }
 
 export default function LicenseInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id, createdAt } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id, createdAt } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -113,7 +113,7 @@ export default function LicenseInfographic({ card }) {
         </div>
       </div>
 
-      {(intro || personality?.length > 0 || favorites?.length > 0 || hasPortfolio || links?.length > 0) && (
+      {(intro || personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 || skills?.length > 0 || hasPortfolio || links?.length > 0) && (
         <div style={{ marginTop: 16, background: '#eef4f8', borderRadius: 12, padding: '16px 18px', boxShadow: '0 12px 30px rgba(20,50,80,0.14)' }}>
           {intro && (
             <div style={{ fontSize: 12, color: INK, fontStyle: 'italic', lineHeight: 1.6, textAlign: 'center' }}>
@@ -134,6 +134,18 @@ export default function LicenseInfographic({ card }) {
                   <FavoriteStamp key={i} label={f.title} />
                 ))}
               </div>
+            </div>
+          )}
+          {certifications?.length > 0 && (
+            <div style={{ marginTop: personality?.length > 0 || favorites?.length > 0 ? 14 : 0 }}>
+              <SectionLabel>CERTIFICATIONS / 자격증</SectionLabel>
+              <div style={{ fontSize: 12, color: INK, lineHeight: 1.9 }}>{certifications.map((c) => c.title).join(' · ')}</div>
+            </div>
+          )}
+          {skills?.length > 0 && (
+            <div style={{ marginTop: personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 ? 14 : 0 }}>
+              <SectionLabel>SKILLS / 스킬</SectionLabel>
+              <div style={{ fontSize: 12, color: INK, lineHeight: 1.9 }}>{skills.map((s) => s.title).join(' · ')}</div>
             </div>
           )}
           {(hasPortfolio || links?.length > 0) && (

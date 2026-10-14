@@ -18,6 +18,14 @@ export default function Step2Info() {
     updatePortfolioItem,
     removePortfolioItem,
     handlePortfolioImageFile,
+    certifications,
+    addCertificationItem,
+    updateCertificationItem,
+    removeCertificationItem,
+    skills,
+    addSkillItem,
+    updateSkillItem,
+    removeSkillItem,
     goStep,
   } = useCard();
   const portfolioFileInputs = useRef({});
@@ -100,6 +108,66 @@ export default function Step2Info() {
       </div>
       <button className="add-link" onClick={addLink} disabled={links.length >= 3}>
         + 링크 추가
+      </button>
+
+      <label>
+        자격증 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(최대 3개, 선택)</span>
+      </label>
+      {certifications.map((item, idx) => (
+        <div className="portfolio-item" key={idx}>
+          <input
+            type="text"
+            placeholder="자격증명 (예: 정보처리기사)"
+            style={{ marginBottom: 8 }}
+            value={item.title}
+            onChange={(e) => updateCertificationItem(idx, 'title', e.target.value)}
+          />
+          <textarea
+            placeholder="발급 기관 · 취득일 (선택)"
+            value={item.desc}
+            onChange={(e) => updateCertificationItem(idx, 'desc', e.target.value)}
+          />
+          <button
+            className="item-remove"
+            style={{ marginTop: 8 }}
+            onClick={() => removeCertificationItem(idx)}
+          >
+            삭제
+          </button>
+        </div>
+      ))}
+      <button className="add-link" onClick={addCertificationItem} disabled={certifications.length >= 3}>
+        + 자격증 추가
+      </button>
+
+      <label style={{ marginTop: 22 }}>
+        스킬 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(최대 6개, 선택)</span>
+      </label>
+      {skills.map((item, idx) => (
+        <div className="portfolio-item" key={idx}>
+          <input
+            type="text"
+            placeholder="스킬명 (예: Figma, Python)"
+            style={{ marginBottom: 8 }}
+            value={item.title}
+            onChange={(e) => updateSkillItem(idx, 'title', e.target.value)}
+          />
+          <textarea
+            placeholder="숙련도 · 한 줄 설명 (선택)"
+            value={item.desc}
+            onChange={(e) => updateSkillItem(idx, 'desc', e.target.value)}
+          />
+          <button
+            className="item-remove"
+            style={{ marginTop: 8 }}
+            onClick={() => removeSkillItem(idx)}
+          >
+            삭제
+          </button>
+        </div>
+      ))}
+      <button className="add-link" onClick={addSkillItem} disabled={skills.length >= 6}>
+        + 스킬 추가
       </button>
 
       {template === 'portfolio' && (

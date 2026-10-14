@@ -20,7 +20,7 @@ function formatIdNumber(id) {
 }
 
 export default function RepublicInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -121,7 +121,7 @@ export default function RepublicInfographic({ card }) {
       </div>
 
       {/* supplementary info below the card, on its own light panel for contrast */}
-      {(intro || personality?.length > 0 || favorites?.length > 0 || hasPortfolio || links?.length > 0) && (
+      {(intro || personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 || skills?.length > 0 || hasPortfolio || links?.length > 0) && (
         <div
           style={{
             marginTop: 16,
@@ -154,6 +154,20 @@ export default function RepublicInfographic({ card }) {
                   <Stamp key={i} label={f.title} />
                 ))}
               </div>
+            </div>
+          )}
+
+          {certifications?.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <RLabel>CERTIFICATIONS / 자격증</RLabel>
+              <div style={{ fontSize: 10.5, color: '#2c2a22', lineHeight: 1.9 }}>{certifications.map((c) => c.title).join(' · ')}</div>
+            </div>
+          )}
+
+          {skills?.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <RLabel>SKILLS / 스킬</RLabel>
+              <div style={{ fontSize: 10.5, color: '#2c2a22', lineHeight: 1.9 }}>{skills.map((s) => s.title).join(' · ')}</div>
             </div>
           )}
 
