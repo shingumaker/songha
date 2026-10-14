@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function ScrapbookInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -45,6 +45,34 @@ export default function ScrapbookInfographic({ card }) {
                 <div style={{ fontSize: 12, color: '#4a4739', lineHeight: 2 }}>
                   {favorites.map((f, i) => (
                     <div key={i}>· {f.title}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Note>
+        </>
+      )}
+
+      {(certifications?.length > 0 || skills?.length > 0) && (
+        <>
+          <Tape align="flex-start" indent={50} rotate={5} color="rgba(230,180,90,0.4)" width={75} />
+          <Note rotate={-0.9} style={{ display: 'flex', gap: 20 }}>
+            {certifications?.length > 0 && (
+              <div style={{ flex: 1 }}>
+                <NoteHeader>자격증</NoteHeader>
+                <div style={{ fontSize: 12, color: '#4a4739', lineHeight: 2 }}>
+                  {certifications.map((c, i) => (
+                    <div key={i}>· {c.title}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {skills?.length > 0 && (
+              <div style={{ flex: 1 }}>
+                <NoteHeader>스킬</NoteHeader>
+                <div style={{ fontSize: 12, color: '#4a4739', lineHeight: 2 }}>
+                  {skills.map((s, i) => (
+                    <div key={i}>· {s.title}</div>
                   ))}
                 </div>
               </div>

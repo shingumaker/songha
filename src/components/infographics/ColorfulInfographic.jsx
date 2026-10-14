@@ -7,7 +7,7 @@ const ACCENT = '#e8672c';
 export default function ColorfulInfographic({ card }) {
   const accentDark = darken(ACCENT, 0.72);
   const accentSoft = lighten(ACCENT, 0.86);
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
   const hasLink = links?.length > 0;
 
@@ -92,7 +92,7 @@ export default function ColorfulInfographic({ card }) {
           </div>
         </div>
 
-        {(personality?.length > 0 || favorites?.length > 0 || hasLink || hasPortfolio) && (
+        {(personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 || skills?.length > 0 || hasLink || hasPortfolio) && (
           <div style={{ display: 'flex', gap: 16, marginTop: 28, flexWrap: 'wrap' }}>
             {personality?.length > 0 && (
               <Card title="성격" accentDark={accentDark}>
@@ -105,6 +105,20 @@ export default function ColorfulInfographic({ card }) {
               <Card title="좋아하는 것" accentDark={accentDark}>
                 {favorites.map((f, i) => (
                   <Item key={i} title={f.title} desc={f.desc} accentSoft={accentSoft} accentDark={accentDark} />
+                ))}
+              </Card>
+            )}
+            {certifications?.length > 0 && (
+              <Card title="자격증" accentDark={accentDark}>
+                {certifications.map((c, i) => (
+                  <Item key={i} title={c.title} desc={c.desc} accentSoft={accentSoft} accentDark={accentDark} />
+                ))}
+              </Card>
+            )}
+            {skills?.length > 0 && (
+              <Card title="스킬" accentDark={accentDark}>
+                {skills.map((s, i) => (
+                  <Item key={i} title={s.title} desc={s.desc} accentSoft={accentSoft} accentDark={accentDark} />
                 ))}
               </Card>
             )}

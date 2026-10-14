@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function SparkleInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -38,7 +38,7 @@ export default function SparkleInfographic({ card }) {
         </div>
       )}
 
-      {(personality?.length > 0 || favorites?.length > 0) && (
+      {(personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 || skills?.length > 0) && (
         <div style={{ display: 'flex', gap: 14, marginTop: 18, flexWrap: 'wrap' }}>
           {personality?.length > 0 && (
             <div style={{ flex: '1 1 180px', background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: '14px 16px' }}>
@@ -59,6 +59,30 @@ export default function SparkleInfographic({ card }) {
                 {favorites.map((f, i) => (
                   <span key={i} style={{ background: '#fff', color: '#241c4a', border: '1px solid #241c4a', fontSize: 10, padding: '4px 10px', borderRadius: 999 }}>
                     {f.title}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {certifications?.length > 0 && (
+            <div style={{ flex: '1 1 180px', background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: '14px 16px' }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 11, color: '#241c4a', marginBottom: 8 }}>✦ 자격증</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {certifications.map((c, i) => (
+                  <span key={i} style={{ background: '#241c4a', color: '#fff', fontSize: 10, padding: '4px 10px', borderRadius: 999 }}>
+                    {c.title}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {skills?.length > 0 && (
+            <div style={{ flex: '1 1 180px', background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: '14px 16px' }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 11, color: '#241c4a', marginBottom: 8 }}>✦ 스킬</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {skills.map((s, i) => (
+                  <span key={i} style={{ background: '#fff', color: '#241c4a', border: '1px solid #241c4a', fontSize: 10, padding: '4px 10px', borderRadius: 999 }}>
+                    {s.title}
                   </span>
                 ))}
               </div>

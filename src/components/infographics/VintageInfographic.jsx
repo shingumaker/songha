@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function VintageInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -43,7 +43,7 @@ export default function VintageInfographic({ card }) {
           </div>
         )}
 
-        {(personality?.length > 0 || favorites?.length > 0) && (
+        {(personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 || skills?.length > 0) && (
           <div style={{ marginTop: 14, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             {personality?.length > 0 && (
               <div style={{ flex: '1 1 140px' }}>
@@ -55,6 +55,18 @@ export default function VintageInfographic({ card }) {
               <div style={{ flex: '1 1 140px' }}>
                 <VLabel>INTERESTS</VLabel>
                 <div style={{ fontSize: 10.5, color: '#4a3d28', lineHeight: 1.9 }}>{favorites.map((f) => f.title).join(' · ')}</div>
+              </div>
+            )}
+            {certifications?.length > 0 && (
+              <div style={{ flex: '1 1 140px' }}>
+                <VLabel>CERTIFICATIONS</VLabel>
+                <div style={{ fontSize: 10.5, color: '#4a3d28', lineHeight: 1.9 }}>{certifications.map((c) => c.title).join(' · ')}</div>
+              </div>
+            )}
+            {skills?.length > 0 && (
+              <div style={{ flex: '1 1 140px' }}>
+                <VLabel>SKILLS</VLabel>
+                <div style={{ fontSize: 10.5, color: '#4a3d28', lineHeight: 1.9 }}>{skills.map((s) => s.title).join(' · ')}</div>
               </div>
             )}
           </div>

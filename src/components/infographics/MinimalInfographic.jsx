@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function MinimalInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -49,6 +49,26 @@ export default function MinimalInfographic({ card }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 30 }}>
               {favorites.map((f, i) => (
                 <TextItem key={i} title={f.title} desc={f.desc} />
+              ))}
+            </div>
+          </div>
+        )}
+        {certifications?.length > 0 && (
+          <div style={{ flex: '1 1 220px' }}>
+            <SecHeader>자격증</SecHeader>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 30 }}>
+              {certifications.map((c, i) => (
+                <TextItem key={i} title={c.title} desc={c.desc} />
+              ))}
+            </div>
+          </div>
+        )}
+        {skills?.length > 0 && (
+          <div style={{ flex: '1 1 220px' }}>
+            <SecHeader>스킬</SecHeader>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 30 }}>
+              {skills.map((s, i) => (
+                <TextItem key={i} title={s.title} desc={s.desc} />
               ))}
             </div>
           </div>

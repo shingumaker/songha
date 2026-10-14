@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function GameStatInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
   const stats = personality?.length
     ? personality.slice(0, 3).map((p, i) => ({ label: p.title, value: 95 - i * 5 }))
@@ -77,6 +77,32 @@ export default function GameStatInfographic({ card }) {
               {favorites.map((f, i) => (
                 <span key={i} style={{ background: '#12162a', color: '#c9cde0', fontSize: 11, padding: '6px 12px', borderRadius: 999, border: '1px solid #333a5c' }}>
                   {f.title}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
+        {certifications?.length > 0 && (
+          <>
+            <SecLabel>자격증</SecLabel>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
+              {certifications.map((c, i) => (
+                <span key={i} style={{ background: '#12162a', color: '#c9cde0', fontSize: 11, padding: '6px 12px', borderRadius: 999, border: '1px solid #333a5c' }}>
+                  {c.title}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
+        {skills?.length > 0 && (
+          <>
+            <SecLabel>스킬</SecLabel>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
+              {skills.map((s, i) => (
+                <span key={i} style={{ background: '#12162a', color: '#c9cde0', fontSize: 11, padding: '6px 12px', borderRadius: 999, border: '1px solid #333a5c' }}>
+                  {s.title}
                 </span>
               ))}
             </div>

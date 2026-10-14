@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function BrowserInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   return (
@@ -39,6 +39,24 @@ export default function BrowserInfographic({ card }) {
         <Win title="likes.txt">
           <div style={{ padding: '14px 16px', fontSize: 11, color: '#3a3a3a', lineHeight: 1.9 }}>
             {favorites.map((f) => f.title).join(' · ')}
+          </div>
+        </Win>
+      )}
+
+      {certifications?.length > 0 && (
+        <Win title="certs.txt">
+          <div style={{ padding: '14px 16px', fontSize: 11, color: '#241c4a', lineHeight: 1.9, fontWeight: 600 }}>
+            {certifications.map((c, i) => (
+              <div key={i}>· {c.title}</div>
+            ))}
+          </div>
+        </Win>
+      )}
+
+      {skills?.length > 0 && (
+        <Win title="skills.txt">
+          <div style={{ padding: '14px 16px', fontSize: 11, color: '#3a3a3a', lineHeight: 1.9 }}>
+            {skills.map((s) => s.title).join(' · ')}
           </div>
         </Win>
       )}

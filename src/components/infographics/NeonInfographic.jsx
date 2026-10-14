@@ -2,7 +2,7 @@ import AvatarDisplay from './AvatarDisplay';
 import { normalizeUrl } from './linkUtils';
 
 export default function NeonInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, photo, avatarIcon, id } = card;
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
   const glow = { textShadow: '0 0 6px currentColor, 0 0 16px currentColor' };
 
@@ -69,6 +69,32 @@ export default function NeonInfographic({ card }) {
               {favorites.map((f, i) => (
                 <span key={i} style={{ border: '1px solid #7ef9ff', color: '#7ef9ff', fontSize: 10, padding: '4px 10px', borderRadius: 6 }}>
                   {f.title}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
+        {certifications?.length > 0 && (
+          <>
+            <NeonLabel color="#ffe066">▸ CERTIFICATIONS</NeonLabel>
+            <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+              {certifications.map((c, i) => (
+                <span key={i} style={{ border: '1px solid #ffe066', color: '#ffe066', fontSize: 10, padding: '4px 10px', borderRadius: 6 }}>
+                  {c.title}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
+        {skills?.length > 0 && (
+          <>
+            <NeonLabel color="#b388ff">▸ SKILLS</NeonLabel>
+            <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+              {skills.map((s, i) => (
+                <span key={i} style={{ border: '1px solid #b388ff', color: '#b388ff', fontSize: 10, padding: '4px 10px', borderRadius: 6 }}>
+                  {s.title}
                 </span>
               ))}
             </div>
