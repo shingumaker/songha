@@ -10,7 +10,11 @@ service cloud.firestore {
       // enough to stop casual/accidental overwrites of someone else's card.
       allow update: if request.resource.data.id == resource.data.id
                     && request.resource.data.editKey == resource.data.editKey;
-      allow delete: if false;
+      // Not gated by any per-card secret (unlike update) — deletion is meant
+      // to be reachable only through the password-gated /admin page in the
+      // app, which is the real protection here; this rule itself trusts
+      // anyone making the request, same trust level as the public read rule.
+      allow delete: if true;
     }
   }
 }

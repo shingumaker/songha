@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore/lite';
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore/lite';
 import { db } from '../lib/firebase';
+import InfographicRenderer from '../components/infographics/InfographicRenderer';
 
 const ADMIN_PASSWORD = '1241';
 const SESSION_KEY = 'songha_admin_unlocked';
@@ -25,6 +26,25 @@ export default function Admin() {
   const [passwordError, setPasswordError] = useState('');
   const [status, setStatus] = useState('idle');
   const [cards, setCards] = useState([]);
+  const [confirmTarget, setConfirmTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const confirmDelete = async () => {
+    if (!confirmTarget || deleting) return;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await deleteDoc(doc(db, 'cards', confirmTarget.id));
+      setCards((prev) => prev.filter((c) => c.id !== confirmTarget.id));
+      setConfirmTarget(null);
+    } catch (err) {
+      console.error('프로필 삭제 실패:', err);
+      setDeleteError('삭제에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const unlock = (e) => {
     e.preventDefault();
@@ -115,27 +135,27 @@ export default function Admin() {
         {status === 'ready' && cards.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {cards.map((c) => (
-              <a
+              <div
                 key={c.id}
-                href={`/card/${c.id}`}
-                target="_blank"
-                rel="noreferrer"
                 className="portfolio-item"
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   gap: 12,
-                  textDecoration: 'none',
-                  color: 'inherit',
                 }}
               >
-                <div style={{ minWidth: 0 }}>
+                <a
+                  href={`/card/${c.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ minWidth: 0, flex: 1, textDecoration: 'none', color: 'inherit' }}
+                >
                   <div style={{ fontWeight: 600, fontSize: 14 }}>{c.name || '(이름 없음)'}</div>
                   <div className="hint" style={{ marginTop: 2 }}>
                     {[c.org, c.role].filter(Boolean).join(' · ') || ' '} · {c.style || '-'}
                   </div>
-                </div>
+                </a>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div className="hint" style={{ margin: 0 }}>
                     {formatDate(c.createdAt)}
@@ -144,11 +164,80 @@ export default function Admin() {
                     /card/{c.id} →
                   </div>
                 </div>
-              </a>
+                <button
+                  type="button"
+                  className="item-remove"
+                  style={{ flexShrink: 0 }}
+                  onClick={() => {
+                    setDeleteError('');
+                    setConfirmTarget(c);
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {confirmTarget && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 20,
+          }}
+          onClick={() => !deleting && setConfirmTarget(null)}
+        >
+          <div
+            style={{
+              background: 'var(--ink-2)',
+              borderRadius: 14,
+              padding: 20,
+              width: '100%',
+              maxWidth: 360,
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxSizing: 'border-box',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>
+              이 프로필을 삭제할까요?
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <InfographicRenderer card={confirmTarget} />
+            </div>
+            <div className="hint" style={{ marginBottom: 14 }}>
+              {confirmTarget.name || '(이름 없음)'} — 삭제하면 되돌릴 수 없습니다.
+            </div>
+            {deleteError && (
+              <div className="hint" style={{ color: 'var(--amber)', marginBottom: 10 }}>
+                {deleteError}
+              </div>
+            )}
+            <div className="nav-row" style={{ marginTop: 0 }}>
+              <button className="ghost" onClick={() => setConfirmTarget(null)} disabled={deleting}>
+                취소
+              </button>
+              <button
+                className="primary"
+                style={{ background: '#e35151', color: '#fff' }}
+                onClick={confirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
