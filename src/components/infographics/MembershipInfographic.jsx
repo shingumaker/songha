@@ -21,14 +21,14 @@ function formatDate(ts) {
 }
 
 export default function MembershipInfographic({ card }) {
-  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id, createdAt } = card;
+  const { name, org, role, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id, createdAt } = card;
   const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
 
   const fields = [
     { label: '이름/Name', value: name },
     { label: '발급일/Date of issue', value: formatDate(createdAt) },
     { label: '직책/Role', value: role },
-    { label: '관심사/Interest', value: intro },
+    { label: '관심사/Interest', value: favorites?.[0]?.title || '' },
     { label: '소속/Member of', value: org },
   ];
 
