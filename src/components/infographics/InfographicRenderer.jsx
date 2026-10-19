@@ -11,6 +11,7 @@ import CivicPassInfographic from './CivicPassInfographic';
 import TechPassInfographic from './TechPassInfographic';
 import LicenseInfographic from './LicenseInfographic';
 import MembershipInfographic from './MembershipInfographic';
+import LinkInBioInfographic from './LinkInBioInfographic';
 
 const RENDERERS = {
   colorful: ColorfulInfographic,
@@ -26,6 +27,7 @@ const RENDERERS = {
   techpass: TechPassInfographic,
   license: LicenseInfographic,
   membership: MembershipInfographic,
+  linkbio: LinkInBioInfographic,
 };
 
 export default function InfographicRenderer({ card }) {

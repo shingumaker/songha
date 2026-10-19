@@ -16,6 +16,7 @@ export const STYLE_BACKGROUNDS = {
   browser: { background: '#5b6bb8', dark: true },
   vintage: { background: '#f3ecd9', dark: false },
   neon: { background: '#121218', dark: true },
+  linkbio: { background: '#f6f6f3', dark: false },
 };
 
 export const DEFAULT_PAGE_BG = { background: '#eef0e6', dark: false };

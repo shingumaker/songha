@@ -34,6 +34,7 @@ const PROFILE_STYLE_META = {
   browser: { label: '브라우저 창형', hint: '겹쳐진 앱 창 콜라주' },
   vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
   neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
+  linkbio: { label: '링크형', hint: 'SNS·링크를 모아 보여주는 링크인바이오 페이지' },
 };
 
 const CARD_STYLE_META = {
