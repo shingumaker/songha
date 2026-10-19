@@ -26,7 +26,7 @@ export default function Step4StyleSelect() {
           className={`tpl-card${style && !styleKeys.includes(style) ? ' selected' : ''}`}
           onClick={() => selectStyle('random')}
         >
-          <div className="n" style={{ fontSize: 13, color: 'var(--lime)' }}>
+          <div className="n" style={{ fontSize: 13 }}>
             🎲 랜덤으로 뽑기
           </div>
           <div className="d">{styleKeys.length}가지 중 하나가 무작위로 정해져요.</div>

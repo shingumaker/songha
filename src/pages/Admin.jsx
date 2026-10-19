@@ -160,7 +160,7 @@ export default function Admin() {
                   <div className="hint" style={{ margin: 0 }}>
                     {formatDate(c.createdAt)}
                   </div>
-                  <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: 'var(--lime)' }}>
+                  <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: 'var(--ink)', fontWeight: 700 }}>
                     /card/{c.id} →
                   </div>
                 </div>
@@ -197,8 +197,9 @@ export default function Admin() {
         >
           <div
             style={{
-              background: 'var(--ink-2)',
-              borderRadius: 14,
+              background: 'var(--paper)',
+              border: '2px solid var(--ink)',
+              borderRadius: 18,
               padding: 20,
               width: '100%',
               maxWidth: 360,
@@ -228,7 +229,7 @@ export default function Admin() {
               </button>
               <button
                 className="primary"
-                style={{ background: '#e35151', color: '#fff' }}
+                style={{ background: '#ff5c5c', color: '#fff' }}
                 onClick={confirmDelete}
                 disabled={deleting}
               >
