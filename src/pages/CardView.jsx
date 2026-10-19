@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore/lite';
 import { db } from '../lib/firebase';
 import { exportCardAsImage } from '../lib/exportCardImage';
 import InfographicRenderer from '../components/infographics/InfographicRenderer';
+import { STYLE_BACKGROUNDS, DEFAULT_PAGE_BG } from '../components/infographics/styleBackgrounds';
 
 const LOAD_TIMEOUT_MS = 15000;
 const EDIT_KEY_PREFIX = 'songha_edit_';
@@ -67,21 +68,29 @@ export default function CardView() {
     }
   };
 
+  const theme = (card && STYLE_BACKGROUNDS[card.style]) || DEFAULT_PAGE_BG;
+  const subTextColor = theme.dark ? 'rgba(255,255,255,0.65)' : 'var(--slate)';
+  const linkColor = theme.dark ? 'rgba(255,255,255,0.92)' : 'var(--ink)';
+
   return (
-    <div className="app card-page">
-      <div className="preview-wrap">
+    <div className="card-view-page" style={{ background: theme.background }}>
+      <div className="card-view-inner">
         <div className="preview-label">디지털 프로필</div>
 
-        {status === 'loading' && <div className="status-line">불러오는 중...</div>}
+        {status === 'loading' && (
+          <div className="status-line" style={{ color: subTextColor }}>
+            불러오는 중...
+          </div>
+        )}
 
         {status === 'not-found' && (
-          <div className="card-view-message">
+          <div className="card-view-message" style={{ color: subTextColor }}>
             <p>존재하지 않는 프로필입니다.</p>
           </div>
         )}
 
         {status === 'error' && (
-          <div className="card-view-message">
+          <div className="card-view-message" style={{ color: subTextColor }}>
             <p>
               프로필을 불러오지 못했습니다.
               <br />
@@ -106,7 +115,7 @@ export default function CardView() {
           </>
         )}
 
-        <Link className="back-link" to="/">
+        <Link className="back-link" style={{ color: linkColor }} to="/">
           새 프로필 만들기 →
         </Link>
       </div>

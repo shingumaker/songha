@@ -607,6 +607,28 @@ textarea {
   margin-bottom: 20px;
 }
 
+/* Full-bleed themed page for the public /card/:id view: fixed to the
+   viewport so it ignores #root's centering padding and genuinely fills the
+   screen with the issued card's own background, and gives the card itself
+   close to the full device width on mobile instead of being squeezed down
+   by several layers of chrome padding. */
+.card-view-page {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  padding: 36px 16px 28px;
+  box-sizing: border-box;
+}
+.card-view-inner {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .card-view-message {
   color: var(--slate);
   font-size: 13px;
