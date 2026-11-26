@@ -15,12 +15,22 @@ export const firebaseConfig = {
   appId: "1:885880567048:web:b88611d9c200f9b936a8bd"
 };
 
-// 운영자 화면(#/staff) PIN — 입력한 PIN으로 역할이 정해집니다.
-// 진짜 보안이 아니라 학생이 실수로 들어오는 것을 막는 정도입니다. 학기마다 바꾸세요.
-//  - 매니저(근로학생): 예약 확정·반려, 출력 시작/완료 사진, 수령 처리, 카톡 안내
-//  - 관리자(담당자): 매니저 기능 + 실적 통계, CSV 내보내기, 상태 정정, 처리자 이력 확인
-export const MANAGER_PIN = "3030";
-export const ADMIN_PIN = "9090";
+// 운영자(매니저·관리자)는 구글 계정으로 로그인합니다. PIN은 쓰지 않습니다.
+//  - 첫 관리자: Firebase 콘솔 → Firestore → printStaff 컬렉션에 문서 ID = 구글 이메일,
+//    필드 role: "admin", name: "이름" 으로 직접 만듭니다. (README 참고)
+//  - 이후 매니저(근로학생)는 관리자 콘솔의 "운영자 관리"에서 이메일로 추가합니다.
+//  - 매니저: 예약 확정·반려, 출력 시작/완료 사진, 수령 처리, 카톡 안내
+//  - 관리자: 매니저 기능 + 실적 통계, CSV, 상태 정정, 운영자 관리, 기록 파기, 공용 PC 설정
+
+// 개인정보 보유 기간(개월). 예약일로부터 이 기간이 지난 기록은 관리자가 "파기"로 익명화합니다.
+export const RETENTION_MONTHS = 12;
+
+// 자동 로그아웃(분): 운영자 / 공용 PC 모드의 학생
+export const STAFF_IDLE_MINUTES = 30;
+export const SHARED_IDLE_MINUTES = 3;
+
+// 개인정보 담당 문의처 (동의서에 표시)
+export const PRIVACY_CONTACT = "창의융합혁신센터 사무실";
 
 // (선택) 카카오 JavaScript 키. developers.kakao.com → 내 애플리케이션 → 앱 키 → JavaScript 키.
 // 비워두면 휴대폰 기본 공유창(카카오톡 선택 가능) 또는 링크 복사로 동작합니다.
