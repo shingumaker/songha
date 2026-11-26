@@ -1,0 +1,57 @@
+rules_version = '2';
+// checkin-app과 같은 Firebase 프로젝트를 쓴다면 이 파일 전체를 콘솔 규칙 탭에 붙여넣으세요.
+// (checkins 규칙이 함께 들어 있어 기존 체크인 앱도 그대로 동작합니다.)
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- 기존 checkin-app ----
+    match /checkins/{studentId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasOnly(['name', 'days', 'times'])
+                   && request.resource.data.name is string
+                   && request.resource.data.days is list
+                   && request.resource.data.days.size() == 33;
+    }
+
+    // ---- 3D프린터 출력 요청 ----
+    // 로그인 없이 쓰는 구조라 링크를 아는 사람은 읽을 수 있습니다. 삭제는 전부 막아 기록을 보존합니다.
+    match /printRequests/{reqId} {
+      allow read: if true;
+      allow create: if request.resource.data.status == 'requested'
+                    && request.resource.data.name is string
+                    && request.resource.data.pin is string
+                    && request.resource.data.pin.size() == 4;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                       'status', 'history', 'rejectReason', 'adminMemo', 'printHours',
+                       'donePhotoCount', 'usagePhotoCount', 'usageNote', 'receivedAt',
+                       'doneAt', 'usedAt', 'updatedAt'])
+                    && request.resource.data.status in
+                       ['requested', 'approved', 'printing', 'done', 'received', 'used', 'rejected', 'canceled'];
+      allow delete: if false;
+    }
+
+    // 예약 칸 잠금 문서. 문서 ID = 날짜_장비_칸. 이미 있으면 생성이 거부되어 중복 예약이 막힙니다.
+    // 연결된 요청이 반려·취소된 경우에만 삭제(칸 반납)할 수 있습니다.
+    match /printSlots/{slotId} {
+      allow read: if true;
+      allow create: if request.resource.data.requestId is string;
+      allow update: if false;
+      allow delete: if get(/databases/$(database)/documents/printRequests/$(resource.data.requestId)).data.status
+                       in ['rejected', 'canceled'];
+    }
+
+    // 출력 완료 / 활용 사진 (브라우저에서 압축한 JPEG를 문서에 직접 저장 — Storage 유료 요금제 불필요)
+    match /printPhotos/{photoId} {
+      allow read: if true;
+      allow create: if request.resource.data.kind in ['done', 'usage']
+                    && request.resource.data.requestId is string
+                    && request.resource.data.data is string
+                    && request.resource.data.data.size() < 950000;
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
