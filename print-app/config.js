@@ -39,18 +39,23 @@ export const KAKAO_JS_KEY = "";
 // (선택) 카카오톡 채널 1:1 채팅 링크. 예: "https://pf.kakao.com/_xxxxxx/chat"
 export const KAKAO_CHANNEL_URL = "";
 
-export const CENTER_NAME = "창의융합혁신센터";
+export const CENTER_NAME = "신구대학교 창의융합혁신센터";
+export const SPACE_NAME = "신구대학교 메이커스페이스";
+export const LOCATION = "미래창의관 지하 1층 3D프린팅룸";
+export const CONTACT = "031-740-1241 또는 카카오톡 채널";
 
-// 보유 장비
+// 보유 장비 (파일 1개 = 프린터 1대)
 export const PRINTERS = [
-  { id: "p1", name: "1호기 (FDM)" },
-  { id: "p2", name: "2호기 (FDM)" },
-  { id: "p3", name: "3호기 (레진)" }
+  ...Array.from({ length: 22 }, (_, i) => ({ id: `p${i + 1}`, no: i + 1, name: `${String(i + 1).padStart(2, "0")}번`, model: "메이커봇 리플리케이터+", material: "PLA" })),
+  { id: "p23", no: 23, name: "23번", model: "메이커봇 스케치 스프린트", material: "" }
 ];
 
-// 예약 가능한 시간 칸(1칸 = 1시간). 학생은 한 장비에서 연속된 칸을 여러 개 잡을 수 있습니다.
+// 방문 예약 시간(1시간 단위)과 시간당 출력 가능 파일 수(관리자 화면에서 조정 가능, 이 값은 기본값)
 export const SLOTS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-export const MAX_SLOTS_PER_REQUEST = 4;
+export const DEFAULT_CAPACITY_PER_HOUR = 10;
+export const MAX_FILES_PER_BOOKING = 5;
+// 예약 시간 이후 몇 분이 지나면 노쇼 처리 가능
+export const NO_SHOW_MINUTES = 30;
 
 // 오늘부터 며칠 뒤까지 예약을 받을지
 export const BOOKING_DAYS_AHEAD = 14;

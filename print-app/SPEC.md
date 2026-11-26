@@ -40,3 +40,9 @@
 - printRequests(비공개): 본인(ownerUid/학번+비번 grant) + 운영자만. printPublic(공개 요약)은 **폐지** — 학생은 전체 열람 불가.
 - 슬롯: 시간별 수용량 카운트(트랜잭션) — printSlotCounts/{date_hour} {count}.
 - 기존 규칙 테스트(에뮬레이터) 방식으로 재검증.
+
+## 추가 결정 (적용 중)
+- **운영자 화면(매니저·관리자)은 포스터 톤 대신 깔끔한 업무용 디자인**: 흰 배경, 얇은 회색 테두리(#E5E7EB), 그림자·굵은 외곽선 없음, 청록 #1F9D7F 한 가지 강조색, 표 중심 레이아웃, Noto Sans KR. 학생 화면만 포스터 톤.
+- 진행 상태 값: booked → onsite → printing → done → received → used → surveyed / noshow / canceled.
+- 규칙 v2 작성 완료(firestore.rules): printStudents(학번 비밀번호 해시), printGrants({uid}_{학번}), printCounts(시간별 파일 수), printSettings/main.capacity, printPrinters. printPublic·printSlots·printKeys 폐지.
+- 남은 작업: (1) 규칙 에뮬레이터 테스트 갱신 (2) app.js 전면 개편 (3) styles.css 학생=포스터 / 운영자=깔끔 (4) xlsx·hwpx/docx 내보내기 (5) E2E (6) README.
