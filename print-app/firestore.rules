@@ -1,0 +1,163 @@
+rules_version = '2';
+// checkin-app과 같은 Firebase 프로젝트라면 이 파일 전체를 콘솔 규칙 탭에 붙여넣으세요.
+//
+// 3D프린터 앱 v2 보안 구조
+//  - 학생(익명 로그인): 본인 예약만. 다른 기기에서는 학번+비밀번호로 열람권(printGrants) 획득
+//  - 학번별 비밀번호: printStudents/{학번}.keyHash = SHA-256(학번:비밀번호). 처음 예약할 때 등록, 아무도 읽을 수 없음
+//  - 매니저/관리자: 구글 로그인 + printStaff/{이메일}
+//  - 시간별 수용량: printCounts/{날짜_시간}.count (파일 수 합계) ≤ printSettings/main.capacity
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- 기존 checkin-app ----
+    match /checkins/{studentId} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasOnly(['name', 'days', 'times'])
+                   && request.resource.data.name is string
+                   && request.resource.data.days is list
+                   && request.resource.data.days.size() == 33;
+    }
+
+    // ---- 공통 ----
+    function signedIn() { return request.auth != null; }
+    function staffPath() { return /databases/$(database)/documents/printStaff/$(request.auth.token.email); }
+    function isStaff() {
+      return signedIn() && ('email' in request.auth.token) && request.auth.token.email is string
+        && request.auth.token.email_verified == true && exists(staffPath());
+    }
+    function isAdmin() { return isStaff() && get(staffPath()).data.role == 'admin'; }
+    function reqPath(id) { return /databases/$(database)/documents/printRequests/$(id); }
+    function stuPath(sn) { return /databases/$(database)/documents/printStudents/$(sn); }
+    function grantPath(sn) { return /databases/$(database)/documents/printGrants/$(request.auth.uid + '_' + sn); }
+    function capacity() { return get(/databases/$(database)/documents/printSettings/main).data.capacity; }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    // 이 학번의 주인: 같은 기기(ownerUid) 또는 학번+비밀번호로 열람권을 얻은 기기
+    function ownsStudent(sn) { return signedIn() && exists(grantPath(sn)); }
+    function ownsReq(data) { return signedIn() && (data.ownerUid == request.auth.uid || ownsStudent(data.studentNo)); }
+
+    match /printSettings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin() && request.resource.data.capacity is int
+                   && request.resource.data.capacity >= 1 && request.resource.data.capacity <= 23;
+    }
+
+    match /printStaff/{email} {
+      allow read: if signedIn() && ((('email' in request.auth.token) && request.auth.token.email == email) || isAdmin());
+      allow create, update: if isAdmin() && request.resource.data.role in ['manager', 'admin'] && request.resource.data.name is string;
+      allow delete: if isAdmin() && request.auth.token.email != email;
+    }
+
+    // 학번별 비밀번호 해시 (읽기 불가). 처음 예약하는 기기가 같은 일괄 저장에서 등록
+    match /printStudents/{sn} {
+      allow read: if false;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['keyHash', 'reqId', 'createdAt'])
+        && getAfter(reqPath(request.resource.data.reqId)).data.ownerUid == request.auth.uid
+        && getAfter(reqPath(request.resource.data.reqId)).data.studentNo == sn
+        && existsAfter(grantPath(sn));
+      allow update: if false;
+      allow delete: if isStaff();   // 비밀번호 분실 시 운영자가 초기화
+    }
+
+    // 열람권: printGrants/{uid}_{학번}. 비밀번호 해시가 맞거나, 처음 등록하는 같은 일괄 저장이면 생성
+    match /printGrants/{grantId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isStaff());
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'studentNo', 'key', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && grantId == request.auth.uid + '_' + request.resource.data.studentNo
+        && (
+          (exists(stuPath(request.resource.data.studentNo))
+            && get(stuPath(request.resource.data.studentNo)).data.keyHash == request.resource.data.key)
+          || (!exists(stuPath(request.resource.data.studentNo))
+            && getAfter(stuPath(request.resource.data.studentNo)).data.keyHash == request.resource.data.key)
+        );
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // 시간별 예약 파일 수
+    match /printCounts/{slotId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['count', 'lastReq'])
+        && !exists(reqPath(request.resource.data.lastReq))
+        && getAfter(reqPath(request.resource.data.lastReq)).data.ownerUid == request.auth.uid
+        && getAfter(reqPath(request.resource.data.lastReq)).data.slotId == slotId
+        && request.resource.data.count == getAfter(reqPath(request.resource.data.lastReq)).data.files
+        && request.resource.data.count <= capacity();
+      allow update: if (isStaff() && request.resource.data.count is int && request.resource.data.count >= 0)
+        || (signedIn()
+          && request.resource.data.keys().hasOnly(['count', 'lastReq'])
+          && (
+            // 새 예약: 파일 수만큼 증가
+            (!exists(reqPath(request.resource.data.lastReq))
+              && getAfter(reqPath(request.resource.data.lastReq)).data.ownerUid == request.auth.uid
+              && getAfter(reqPath(request.resource.data.lastReq)).data.slotId == slotId
+              && request.resource.data.count == resource.data.count + getAfter(reqPath(request.resource.data.lastReq)).data.files
+              && request.resource.data.count <= capacity())
+            // 예약 취소: 파일 수만큼 감소
+            || (exists(reqPath(request.resource.data.lastReq))
+              && ownsReq(get(reqPath(request.resource.data.lastReq)).data)
+              && get(reqPath(request.resource.data.lastReq)).data.status == 'booked'
+              && getAfter(reqPath(request.resource.data.lastReq)).data.status == 'canceled'
+              && get(reqPath(request.resource.data.lastReq)).data.slotId == slotId
+              && request.resource.data.count == resource.data.count - get(reqPath(request.resource.data.lastReq)).data.files)
+          ));
+      allow delete: if false;
+    }
+
+    // 예약·이용기록 원본 (비공개: 본인과 운영자만)
+    match /printRequests/{id} {
+      allow read: if isStaff() || ownsReq(resource.data);
+      allow create: if signedIn()
+        && request.resource.data.id == id
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'booked'
+        && request.resource.data.studentNo is string && request.resource.data.studentNo.size() > 0
+        && request.resource.data.name is string
+        && request.resource.data.files is int && request.resource.data.files >= 1 && request.resource.data.files <= 5
+        && request.resource.data.slotId == request.resource.data.date + '_' + request.resource.data.time
+        && existsAfter(/databases/$(database)/documents/printCounts/$(request.resource.data.slotId))
+        && getAfter(/databases/$(database)/documents/printCounts/$(request.resource.data.slotId)).data.lastReq == id
+        && existsAfter(grantPath(request.resource.data.studentNo))
+        && !('pin' in request.resource.data) && !('phone' in request.resource.data);
+      allow update: if
+        (isAdmin() && !changed().hasAny(['ownerUid', 'id', 'createdAt', 'studentNo']))
+        || (isStaff() && !changed().hasAny(['ownerUid', 'id', 'createdAt', 'studentNo', 'name', 'cert', 'date', 'time', 'slotId', 'files']))
+        || (ownsReq(resource.data) && (
+          (resource.data.status == 'booked' && request.resource.data.status == 'canceled'
+            && changed().hasOnly(['status', 'history', 'updatedAt']))
+          || (resource.data.status == 'done' && request.resource.data.status == 'received'
+            && changed().hasOnly(['status', 'history', 'updatedAt', 'receivedAt']))
+          || (resource.data.status == 'received' && request.resource.data.status == 'used'
+            && changed().hasOnly(['status', 'history', 'updatedAt', 'usedAt', 'usageNote', 'usagePhotoCount']))
+          || (resource.data.status == 'used' && request.resource.data.status == 'surveyed'
+            && changed().hasOnly(['status', 'history', 'updatedAt', 'survey'])
+            && request.resource.data.survey.rating is int
+            && request.resource.data.survey.rating >= 1 && request.resource.data.survey.rating <= 5)
+        ));
+      allow delete: if false;
+
+      match /photos/{photoId} {
+        allow read: if isStaff() || ownsReq(get(reqPath(id)).data);
+        allow create: if request.resource.data.data is string && request.resource.data.data.size() < 950000
+          && ((isStaff() && request.resource.data.kind in ['done', 'usage'])
+            || (ownsReq(get(reqPath(id)).data) && request.resource.data.kind == 'usage'));
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // 프린터 23대 상태 (운영자만)
+    match /printPrinters/{pid} {
+      allow read: if isStaff();
+      allow write: if isStaff()
+        && request.resource.data.status in ['ok', 'busy', 'admin', 'check', 'broken'];
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
