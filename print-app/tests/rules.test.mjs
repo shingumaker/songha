@@ -1,0 +1,47 @@
+import { initializeTestEnvironment, assertSucceeds as ok, assertFails as no } from '@firebase/rules-unit-testing';
+import { readFileSync } from 'fs';
+import { doc, getDoc, getDocs, setDoc, updateDoc, writeBatch, collection, query, where, addDoc } from 'firebase/firestore';
+const env = await initializeTestEnvironment({ projectId: 'demo-v2', firestore: { rules: readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8'), host: '127.0.0.1', port: 8181 } });
+await env.withSecurityRulesDisabled(async (c) => {
+  const d = c.firestore();
+  await setDoc(doc(d, 'printStaff/mgr@x.com'), { role: 'manager', name: '근로' });
+  await setDoc(doc(d, 'printStaff/admin@x.com'), { role: 'admin', name: '담당' });
+  await setDoc(doc(d, 'printSettings/main'), { capacity: 10 });
+});
+const A = env.authenticatedContext('A').firestore(), B = env.authenticatedContext('B').firestore(), E = env.authenticatedContext('E').firestore();
+const M = env.authenticatedContext('m', { email: 'mgr@x.com', email_verified: true }).firestore();
+let n = 0; const t = async (nm, p) => { try { await p; n++; } catch (e) { console.log('FAIL', nm, e.message.slice(0, 120)); process.exitCode = 1; } };
+const slot = '2026-11-30_13:00';
+const book = (db, uid, id, sn, files, key, first, countPrev) => {
+  const b = writeBatch(db);
+  b.set(doc(db, 'printRequests', id), { id, ownerUid: uid, status: 'booked', studentNo: sn, name: 'n', cert: '소지', date: '2026-11-30', time: '13:00', slotId: slot, files, history: [] });
+  b.set(doc(db, 'printCounts', slot), { count: (countPrev || 0) + files, lastReq: id });
+  if (first) { b.set(doc(db, 'printStudents', sn), { keyHash: key, reqId: id, createdAt: 1 }); b.set(doc(db, 'printGrants', `${uid}_${sn}`), { uid, studentNo: sn, key, createdAt: 1 }); }
+  return b.commit();
+};
+await t('A first booking 3 files', ok(book(A, 'A', 'R1', '2025', 3, 'K1', true, 0)));
+await t('count must match files', no(book(B, 'B', 'R2', '2024', 2, 'K2', true, 5)));
+await t('B booking 6 → total 9', ok(book(B, 'B', 'R2', '2024', 5, 'K2', true, 3)));
+await t('over capacity rejected', no(book(E, 'E', 'R3', '2023', 3, 'K3', true, 8)));
+await t('E cannot hijack 2025 (wrong key)', no(setDoc(doc(E, 'printGrants', 'E_2025'), { uid: 'E', studentNo: '2025', key: 'bad', createdAt: 1 })));
+await t('E cannot read R1', no(getDoc(doc(E, 'printRequests', 'R1'))));
+await t('A reads R1', ok(getDoc(doc(A, 'printRequests', 'R1'))));
+await t('A new device with right key', ok(setDoc(doc(E, 'printGrants', 'E_2025'), { uid: 'E', studentNo: '2025', key: 'K1', createdAt: 1 })));
+await t('granted device reads R1', ok(getDoc(doc(E, 'printRequests', 'R1'))));
+await t('granted device lists own studentNo', ok(getDocs(query(collection(E, 'printRequests'), where('studentNo', '==', '2025')))));
+await t('B cannot read R1', no(getDoc(doc(B, 'printRequests', 'R1'))));
+await t('student cannot jump to done', no(updateDoc(doc(A, 'printRequests', 'R1'), { status: 'done' })));
+const cancel = writeBatch(B); cancel.update(doc(B, 'printRequests', 'R2'), { status: 'canceled', updatedAt: 2 }); cancel.update(doc(B, 'printCounts', slot), { count: 3, lastReq: 'R2' });
+await t('B cancel frees 5', ok(cancel.commit()));
+await t('manager lists all', ok(getDocs(collection(M, 'printRequests'))));
+await t('manager records done', ok(updateDoc(doc(M, 'printRequests', 'R1'), { status: 'done', record: { title: 'x' } })));
+await t('manager sets printer busy', ok(setDoc(doc(M, 'printPrinters', 'p3'), { status: 'busy', reqId: 'R1' })));
+await t('student cannot read printers', no(getDoc(doc(A, 'printPrinters', 'p3'))));
+await t('student receive', ok(updateDoc(doc(A, 'printRequests', 'R1'), { status: 'received', receivedAt: 3 })));
+await t('student usage photo', ok(addDoc(collection(A, 'printRequests/R1/photos'), { kind: 'usage', data: 'x' })));
+await t('student used', ok(updateDoc(doc(A, 'printRequests', 'R1'), { status: 'used', usageNote: 'ok', usagePhotoCount: 1 })));
+await t('survey bad rating', no(updateDoc(doc(A, 'printRequests', 'R1'), { status: 'surveyed', survey: { rating: 9 } })));
+await t('survey ok', ok(updateDoc(doc(A, 'printRequests', 'R1'), { status: 'surveyed', survey: { rating: 5, again: '네' } })));
+await t('students hash unreadable', no(getDoc(doc(A, 'printStudents', '2025'))));
+await t('manager cannot change capacity', no(setDoc(doc(M, 'printSettings/main'), { capacity: 12 })));
+console.log('passed', n); await env.cleanup();
