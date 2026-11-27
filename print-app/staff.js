@@ -99,13 +99,21 @@ export function console_() {
 
 // ---------- 이용기록 입력 (장비 선택 → 자동 출력 중) ----------
 export function record(id) {
-  let r = null, printers = [], picked = [];
+  let r = null, printers = [], picked = [], renderedStatus = null;
   shell(`<div id="rc"><p class="o-muted">불러오는 중…</p></div>`, true);
   const draw = () => {
     if (!r) return;
     const rec = r.record || {};
     if (!picked.length && rec.printers) picked = [...rec.printers];
     const avail = printers.filter((p) => p.status === "ok" || picked.includes(p.no));
+    const chips = avail.map((p) => `<button type="button" class="o-pchip ${picked.includes(p.no) ? "on" : ""}" data-no="${p.no}">${esc(p.name)}<small>${p.no === 23 ? "스케치 스프린트" : "리플리케이터+"}</small></button>`).join("") || `<p class="o-muted">사용 가능한 프린터가 없습니다.</p>`;
+    // 입력 중인 내용이 지워지지 않도록, 상태가 같으면 장비 목록만 갱신
+    if (document.getElementById("rf") && renderedStatus === r.status) {
+      document.getElementById("pp").innerHTML = chips;
+      document.getElementById("pcount").textContent = `${picked.length}/${r.files} 선택`;
+      return;
+    }
+    renderedStatus = r.status;
     document.getElementById("rc").innerHTML = `<div class="o-head"><h1>이용기록 입력</h1>${badge(r.status)}</div>
     <div class="o-info"><span>예약 <b>${dateLabel(r.date)} ${esc(r.time)}</b></span><span>학번 <b>${esc(r.studentNo)}</b></span><span>이름 <b>${esc(r.name)}</b></span><span>자격증 <b>${esc(r.cert)}</b></span><span>파일 <b>${r.files}개</b></span></div>
     <form class="o-card o-form" id="rf">
@@ -119,8 +127,8 @@ export function record(id) {
         <label>출력 시작<input name="start" type="time" value="${esc(rec.start || "")}"></label>
         <label>출력 종료(예정)<input name="end" type="time" value="${esc(rec.end || "")}"></label>
       </div>
-      <h2>사용 장비 <small class="o-muted">파일 1개 = 프린터 1대 · ${picked.length}/${r.files} 선택</small></h2>
-      <div class="o-printers" id="pp">${avail.map((p) => `<button type="button" class="o-pchip ${picked.includes(p.no) ? "on" : ""}" data-no="${p.no}">${esc(p.name)}<small>${p.no === 23 ? "스케치 스프린트" : "리플리케이터+"}</small></button>`).join("") || `<p class="o-muted">사용 가능한 프린터가 없습니다.</p>`}</div>
+      <h2>사용 장비 <small class="o-muted">파일 1개 = 프린터 1대 · <span id="pcount">${picked.length}/${r.files} 선택</span></small></h2>
+      <div class="o-printers" id="pp">${chips}</div>
       <div class="o-row">
         <button type="button" class="o-btn primary" id="startBtn" ${r.status === "onsite" ? "" : "disabled"}>출력 시작 (장비 자동 '출력 중')</button>
       </div>

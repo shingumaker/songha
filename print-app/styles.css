@@ -169,3 +169,8 @@ fieldset { margin: 0; padding: 0; border: 0; }
 .ps-broken { background: #F9FAFB; }
 .o-search { min-width: 240px; }
 .o-login { max-width: 420px; padding-top: 80px !important; display: grid; gap: 12px; }
+/* 휴대폰에서 입력칸이 카드 밖으로 넘치지 않게 */
+.s-card > *, .s-card label, .s-card fieldset { min-width: 0; }
+.s-card input, .s-card textarea, .s-card select { width: 100%; min-width: 0; }
+.s-pills, .s-times { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.s-files { flex-wrap: wrap; }
