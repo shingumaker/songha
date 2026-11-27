@@ -45,4 +45,4 @@
 - **운영자 화면(매니저·관리자)은 포스터 톤 대신 깔끔한 업무용 디자인**: 흰 배경, 얇은 회색 테두리(#E5E7EB), 그림자·굵은 외곽선 없음, 청록 #1F9D7F 한 가지 강조색, 표 중심 레이아웃, Noto Sans KR. 학생 화면만 포스터 톤.
 - 진행 상태 값: booked → onsite → printing → done → received → used → surveyed / noshow / canceled.
 - 규칙 v2 작성 완료(firestore.rules): printStudents(학번 비밀번호 해시), printGrants({uid}_{학번}), printCounts(시간별 파일 수), printSettings/main.capacity, printPrinters. printPublic·printSlots·printKeys 폐지.
-- 완료: (1) 규칙 테스트 24개 통과 (tests/rules.test.mjs). 남은 작업: (2) app.js 전면 개편 (3) styles.css 학생=포스터 / 운영자=깔끔 (4) xlsx·hwpx/docx 내보내기 (5) E2E (6) README.
+- 완료: (1) 규칙 테스트 24개 통과 (tests/rules.test.mjs), common.js(공통 모듈). 남은 작업: (2) student.js·staff.js 작성 후 app.js는 라우터만 (common.js 사용) (3) styles.css 학생=포스터 / 운영자=깔끔 (4) xlsx·hwpx/docx 내보내기 (5) E2E (6) README.
