@@ -1,8 +1,10 @@
+import { useRef } from 'react';
 import { useCard } from '../context/CardContext';
 
 export default function Step2Info() {
   const {
     step,
+    currentStepName,
     template,
     templateCopy,
     fields,
@@ -15,13 +17,23 @@ export default function Step2Info() {
     addPortfolioItem,
     updatePortfolioItem,
     removePortfolioItem,
+    handlePortfolioImageFile,
+    certifications,
+    addCertificationItem,
+    updateCertificationItem,
+    removeCertificationItem,
+    skills,
+    addSkillItem,
+    updateSkillItem,
+    removeSkillItem,
     goStep,
   } = useCard();
+  const portfolioFileInputs = useRef({});
 
   const nameValid = fields.name.trim().length > 0;
 
   return (
-    <div className={`panel${step === 2 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'info' ? ' active' : ''}`}>
       <label>
         이름 <span className="req">*</span>
       </label>
@@ -64,7 +76,9 @@ export default function Step2Info() {
         value={fields.intro}
         onChange={(e) => updateField('intro', e.target.value)}
       />
-      <div className="hint">비워두면 발급 시 AI가 자동으로 한 줄을 만들어 드립니다.</div>
+      <div className="hint">
+        비워두면 다음 성격·취향 단계에서 AI로 직접 만들어볼 수 있고, 그래도 비어 있으면 발급 시 자동으로 채워드려요.
+      </div>
 
       <label>
         연락처 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(선택 공개)</span>
@@ -96,6 +110,66 @@ export default function Step2Info() {
         + 링크 추가
       </button>
 
+      <label>
+        자격증 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(최대 3개, 선택)</span>
+      </label>
+      {certifications.map((item, idx) => (
+        <div className="portfolio-item" key={idx}>
+          <input
+            type="text"
+            placeholder="자격증명 (예: 정보처리기사)"
+            style={{ marginBottom: 8 }}
+            value={item.title}
+            onChange={(e) => updateCertificationItem(idx, 'title', e.target.value)}
+          />
+          <textarea
+            placeholder="발급 기관 · 취득일 (선택)"
+            value={item.desc}
+            onChange={(e) => updateCertificationItem(idx, 'desc', e.target.value)}
+          />
+          <button
+            className="item-remove"
+            style={{ marginTop: 8 }}
+            onClick={() => removeCertificationItem(idx)}
+          >
+            삭제
+          </button>
+        </div>
+      ))}
+      <button className="add-link" onClick={addCertificationItem} disabled={certifications.length >= 3}>
+        + 자격증 추가
+      </button>
+
+      <label style={{ marginTop: 22 }}>
+        스킬 <span style={{ color: 'var(--slate)', fontWeight: 400 }}>(최대 6개, 선택)</span>
+      </label>
+      {skills.map((item, idx) => (
+        <div className="portfolio-item" key={idx}>
+          <input
+            type="text"
+            placeholder="스킬명 (예: Figma, Python)"
+            style={{ marginBottom: 8 }}
+            value={item.title}
+            onChange={(e) => updateSkillItem(idx, 'title', e.target.value)}
+          />
+          <textarea
+            placeholder="숙련도 · 한 줄 설명 (선택)"
+            value={item.desc}
+            onChange={(e) => updateSkillItem(idx, 'desc', e.target.value)}
+          />
+          <button
+            className="item-remove"
+            style={{ marginTop: 8 }}
+            onClick={() => removeSkillItem(idx)}
+          >
+            삭제
+          </button>
+        </div>
+      ))}
+      <button className="add-link" onClick={addSkillItem} disabled={skills.length >= 6}>
+        + 스킬 추가
+      </button>
+
       {template === 'portfolio' && (
         <div id="portfolio-block">
           <label>
@@ -116,6 +190,36 @@ export default function Step2Info() {
                   value={item.desc}
                   onChange={(e) => updatePortfolioItem(idx, 'desc', e.target.value)}
                 />
+                <input
+                  type="text"
+                  placeholder="링크 (선택, 예: github.com/me/project)"
+                  style={{ marginTop: 8 }}
+                  value={item.link || ''}
+                  onChange={(e) => updatePortfolioItem(idx, 'link', e.target.value)}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                  {item.image && (
+                    <img
+                      src={item.image}
+                      alt=""
+                      style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }}
+                    />
+                  )}
+                  <button
+                    type="button"
+                    className="item-remove"
+                    onClick={() => portfolioFileInputs.current[idx]?.click()}
+                  >
+                    {item.image ? '이미지 변경' : '+ 이미지 첨부'}
+                  </button>
+                  <input
+                    ref={(el) => (portfolioFileInputs.current[idx] = el)}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => handlePortfolioImageFile(idx, e.target.files[0])}
+                  />
+                </div>
                 <button
                   className="item-remove"
                   style={{ marginTop: 8 }}
@@ -133,10 +237,10 @@ export default function Step2Info() {
       )}
 
       <div className="nav-row">
-        <button className="ghost" onClick={() => goStep(1)}>
+        <button className="ghost" onClick={() => goStep(step - 1)}>
           이전
         </button>
-        <button className="primary" disabled={!nameValid} onClick={() => goStep(3)}>
+        <button className="primary" disabled={!nameValid} onClick={() => goStep(step + 1)}>
           다음
         </button>
       </div>

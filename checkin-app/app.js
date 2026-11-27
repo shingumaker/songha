@@ -19,8 +19,6 @@ const STUDENTS = [
   { id: "s11", name: "김명성" }
 ];
 const TOTAL_DAYS = 33;
-const VERSE_TEXT = "많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이 영원토록 빛나리라 -단 12:3-";
-const VERSE_TEXT_2LINE = "많은 사람을 옳은 데로 돌아오게 한 자는 별과 같이<br>영원토록 빛나리라 -단 12:3-";
 const START_YEAR = 2026, START_MONTH = 8, START_DATE = 1; // 2026-09-01
 const STAR_COLORS = ["#EAF2FF", "#FFFFFF", "#FFE9C2", "#FFC9A6"];
 
@@ -34,9 +32,7 @@ const state = {
   data: {},      // { [studentId]: { name, days:[33 bool], times:{ [dayIdx]: ms } } }
   loaded: false,
   route: "student",
-  adminSelected: 0, // 모바일 관리자 화면에서 선택된 학생 index
-  gallerySelectedDay: null, // 관리자 화면 별자리 갤러리에서 선택된 날짜 index
-  galleryOpen: false // 관리자 화면 별자리 갤러리 펼침 여부
+  adminSelected: 0 // 모바일 관리자 화면에서 선택된 학생 index
 };
 
 // ---------- 날짜 유틸 ----------
@@ -228,20 +224,10 @@ function computeDerived() {
   return { idx, isActiveToday, refIdx, elapsed, perStudent, todayArrivals, rankByName, cumulative, avgPercent, maxStreak, todayDoneCount };
 }
 
-// 관리자 갤러리: 지난 특정 날짜 기준으로 그날까지의 누적 점수/체크 여부를 재구성
-function perStudentForDay(dayIdx) {
-  return STUDENTS.map((st) => {
-    const rec = state.data[st.id] || { name: st.name, days: Array(TOTAL_DAYS).fill(false), times: {} };
-    const count = rec.days.slice(0, dayIdx + 1).filter(Boolean).length;
-    const doneToday = !!rec.days[dayIdx];
-    return { id: st.id, name: st.name, rec, count, doneToday };
-  });
-}
-
 // ---------- 렌더: 별자리 ----------
 function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
   if (!isActiveToday) {
-    return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
+    return `<div class="constellation-bg" style="height:${big ? 220 : 230}px;"><div class="star-empty">챌린지 기간이 아니에요<br>(2026.09.01 – 2026.10.03)</div></div>`;
   }
   const positions = scatterPositions(perStudent, dayIdx);
   const stars = perStudent.map((p, idx) => {
@@ -266,7 +252,7 @@ function renderConstellation(perStudent, isActiveToday, big, dayIdx) {
     }
     return `<div class="star" style="left:${x}%;top:${y}%;"><div class="star-pending"></div></div>`;
   }).join("");
-  return `<div class="constellation-bg" style="height:${big ? 220 : 350}px;">${stars}</div>`;
+  return `<div class="constellation-bg" style="height:${big ? 220 : 230}px;">${stars}</div>`;
 }
 
 function ringGauge(percent, size, holeSize, fontSize) {
@@ -342,16 +328,12 @@ function renderStudentScreen(myId) {
   return `
     <div class="eyebrow">PROBE · ${me.name}</div>
     <h1>온라인선교 챌린지</h1>
-    <div class="sub" style="margin-bottom:6px;">2026.09.01 – 2026.10.03 · 총 ${TOTAL_DAYS}일</div>
-    <div class="verse-caption">${VERSE_TEXT}</div>
+    <div class="sub" style="margin-bottom:16px;">2026.09.01 – 2026.10.03 · 총 ${TOTAL_DAYS}일</div>
 
     <div class="card" style="margin-bottom:14px;">
       <div class="panel-head">
         <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
-          ${d.isActiveToday ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${d.idx}" title="사진으로 저장">📸 저장</button>` : ""}
-        </div>
+        <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
       </div>
       ${renderConstellation(d.perStudent, d.isActiveToday, true, d.idx)}
     </div>
@@ -363,7 +345,7 @@ function renderStudentScreen(myId) {
       </div>
       <div class="card">
         <div class="panel-title" style="color:var(--violet);margin-bottom:8px;"><span class="live-dot" style="background:var(--violet);box-shadow:0 0 4px var(--violet);"></span>누적랭킹</div>
-        ${rankRowsHtml(d.cumulative.filter((c) => c.count * 5 >= 5).map((c, i) => ({ rank: i + 1, name: c.name, meta: (c.count * 5) + "점" })), "아직 5점 이상인 학생이 없어요")}
+        ${rankRowsHtml(d.cumulative.map((c, i) => ({ rank: i + 1, name: c.name, meta: (c.count * 5) + "점" })), "")}
       </div>
     </div>
 
@@ -431,15 +413,12 @@ function renderAdminScreen() {
       </div>`).join("")
     : `<div class="star-empty" style="padding:16px 0;">${d.isActiveToday ? "아직 아무도 체크하지 않았어요" : "챌린지 기간이 아니에요"}</div>`;
 
-  const cumulativeQualified = d.cumulative.filter((c) => c.count * 5 >= 5);
-  const cumulativeRows = cumulativeQualified.length
-    ? cumulativeQualified.map((c, i) => `
-      <div class="rank-row" style="background:${i === 0 ? "rgba(139,92,246,0.12)" : "transparent"};">
-        <div class="rank-num" style="color:${i === 0 ? "var(--violet)" : "var(--star)"};width:22px;">#${i + 1}</div>
-        <div class="rank-name">${c.name}</div>
-        <div class="rank-meta">${c.count * 5}점</div>
-      </div>`).join("")
-    : `<div class="star-empty" style="padding:16px 0;">아직 5점 이상인 학생이 없어요</div>`;
+  const cumulativeRows = d.cumulative.map((c, i) => `
+    <div class="rank-row" style="background:${i === 0 ? "rgba(139,92,246,0.12)" : "transparent"};">
+      <div class="rank-num" style="color:${i === 0 ? "var(--violet)" : "var(--star)"};width:22px;">#${i + 1}</div>
+      <div class="rank-name">${c.name}</div>
+      <div class="rank-meta">${c.count * 5}점</div>
+    </div>`).join("");
 
   // 체크 관리 테이블 (데스크탑: 전체 표 / 모바일: 학생 선택 + 개인 그리드)
   let headCells = "";
@@ -469,22 +448,6 @@ function renderAdminScreen() {
     </tr>`;
   });
 
-  // 별자리 갤러리: 지난 날짜의 별자리를 날짜 탭으로 골라 다시 그려서 보여줌
-  const maxGalleryDay = d.isActiveToday ? d.idx : (d.idx >= TOTAL_DAYS ? TOTAL_DAYS - 1 : -1);
-  let gsel = state.gallerySelectedDay;
-  if (gsel === null || gsel > maxGalleryDay) gsel = maxGalleryDay;
-  const galleryTabs = [];
-  for (let i = 0; i <= maxGalleryDay; i++) {
-    galleryTabs.push(`<button class="gallery-tab-btn ${i === gsel ? "on" : ""}" data-action="select-gallery-day" data-day="${i}">${dateLabel(i)}${d.isActiveToday && i === d.idx ? " · 오늘" : ""}</button>`);
-  }
-  const galleryBody = maxGalleryDay < 0
-    ? `<div class="star-empty" style="padding:16px 0;">아직 챌린지가 시작되지 않았어요</div>`
-    : `
-      <div class="gallery-tab-row">${galleryTabs.join("")}</div>
-      <div class="gallery-date-label">${dateAt(gsel).getFullYear()}.${String(dateAt(gsel).getMonth() + 1).padStart(2, "0")}.${String(dateAt(gsel).getDate()).padStart(2, "0")} · DAY ${gsel + 1} / ${TOTAL_DAYS}</div>
-      ${renderConstellation(perStudentForDay(gsel), true, false, gsel)}
-    `;
-
   const selIdx = clamp(state.adminSelected, 0, d.perStudent.length - 1);
   const selP = d.perStudent[selIdx];
   const chips = d.perStudent.map((p, i) => `
@@ -509,18 +472,14 @@ function renderAdminScreen() {
   return `
     <div class="eyebrow">MISSION CONTROL</div>
     <h1>온라인선교 챌린지 관리</h1>
-    <div class="sub" style="margin-bottom:6px;">2026.09.01 – 2026.10.03 · ${d.isActiveToday ? "DAY " + (d.idx + 1) + " / " + TOTAL_DAYS + " 진행 중" : (d.idx < 0 ? "시작 전" : "종료")}</div>
-    <div class="verse-caption">${VERSE_TEXT}</div>
+    <div class="sub" style="margin-bottom:16px;">2026.09.01 – 2026.10.03 · ${d.isActiveToday ? "DAY " + (d.idx + 1) + " / " + TOTAL_DAYS + " 진행 중" : (d.idx < 0 ? "시작 전" : "종료")}</div>
 
     <div class="stat-grid" style="margin-bottom:14px;">${statTiles}</div>
 
     <div class="card" style="margin-bottom:14px;">
       <div class="panel-head">
         <div class="panel-title" style="color:var(--cyan);"><span class="live-dot" style="background:var(--cyan);box-shadow:0 0 5px var(--cyan);"></span>오늘의 별자리</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
-          ${d.isActiveToday ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${d.idx}" title="사진으로 저장">📸 저장</button>` : ""}
-        </div>
+        <div class="panel-note">${d.isActiveToday ? d.todayDoneCount + " / " + STUDENTS.length + " 도착" : ""}</div>
       </div>
       ${renderConstellation(d.perStudent, d.isActiveToday, false, d.idx)}
     </div>
@@ -560,20 +519,6 @@ function renderAdminScreen() {
       </div>
     </div>
 
-    <div class="link-row" style="margin-bottom:${state.galleryOpen ? 10 : 20}px;">
-      <button class="link-btn" data-action="toggle-gallery">${state.galleryOpen ? "별자리 갤러리 숨기기 ▲" : "📸 별자리 갤러리 보기 ▼"}</button>
-    </div>
-
-    ${state.galleryOpen ? `
-    <div class="card" style="margin-bottom:20px;">
-      <div class="panel-head">
-        <div class="panel-title" style="color:var(--gold);"><span class="live-dot" style="background:var(--gold);box-shadow:0 0 4px var(--gold);"></span>별자리 갤러리</div>
-        ${maxGalleryDay >= 0 ? `<button class="save-shot-btn" data-action="save-constellation" data-day="${gsel}" title="사진으로 저장">📸 저장</button>` : ""}
-      </div>
-      ${galleryBody}
-    </div>
-    ` : ""}
-
     <div class="link-row">
       <button class="link-btn" data-action="goto-student">학생 화면으로 ←</button>
     </div>
@@ -590,7 +535,7 @@ function render() {
   const bg = `<div class="starfield-bg"></div>`;
 
   if (!state.loaded) {
-    app.innerHTML = bg + `<div class="empty-notice">불러오는 중...<div class="verse-line">${VERSE_TEXT_2LINE}</div></div>`;
+    app.innerHTML = bg + `<div class="empty-notice">불러오는 중...</div>`;
     return;
   }
   if (state.loaded === "error") {
@@ -634,47 +579,8 @@ document.addEventListener("click", (e) => {
   } else if (action === "select-admin-student") {
     state.adminSelected = Number(el.dataset.idx);
     render();
-  } else if (action === "save-constellation") {
-    saveConstellationShot(el, Number(el.dataset.day));
-  } else if (action === "select-gallery-day") {
-    state.gallerySelectedDay = Number(el.dataset.day);
-    render();
-  } else if (action === "toggle-gallery") {
-    state.galleryOpen = !state.galleryOpen;
-    render();
   }
 });
-
-async function saveConstellationShot(btnEl, dayIdx) {
-  const target = btnEl.closest(".card").querySelector(".constellation-bg");
-  if (!target) return;
-  if (!window.html2canvas) {
-    alert("사진 저장 기능을 불러오지 못했어요. 새로고침 후 다시 시도해주세요.");
-    return;
-  }
-  const originalLabel = btnEl.textContent;
-  btnEl.textContent = "저장 중...";
-  btnEl.disabled = true;
-  try {
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 15000));
-    const canvas = await Promise.race([
-      window.html2canvas(target, { backgroundColor: "#05070d", scale: 2 }),
-      timeout
-    ]);
-    const link = document.createElement("a");
-    link.download = `constellation_${dateAt(dayIdx).getFullYear()}-${String(dateAt(dayIdx).getMonth() + 1).padStart(2, "0")}-${String(dateAt(dayIdx).getDate()).padStart(2, "0")}.png`;
-    link.href = canvas.toDataURL("image/png");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (e) {
-    console.error("save shot failed", e);
-    alert("저장에 실패했어요. 다시 시도해주세요.");
-  } finally {
-    btnEl.textContent = originalLabel;
-    btnEl.disabled = false;
-  }
-}
 
 document.addEventListener("submit", (e) => {
   const form = e.target.closest('[data-action="pin-submit"]');

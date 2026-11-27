@@ -1,4 +1,7 @@
-export default function Badge({ tag, photoSrc, name, role, intro, links = [], portfolio = [], cardId }) {
+import AvatarDisplay from './infographics/AvatarDisplay';
+import { normalizeUrl } from './infographics/linkUtils';
+
+export default function Badge({ tag, photoSrc, avatarIcon, name, role, intro, links = [], portfolio = [], cardId }) {
   return (
     <div className="badge">
       <div className="badge-top">
@@ -9,7 +12,9 @@ export default function Badge({ tag, photoSrc, name, role, intro, links = [], po
         </div>
         <div className="badge-tag">{tag || 'TYPE'}</div>
       </div>
-      <div className="badge-photo">{photoSrc ? <img src={photoSrc} alt="프로필" /> : '사진'}</div>
+      <div className="badge-photo">
+        <AvatarDisplay photo={photoSrc} avatarIcon={avatarIcon} size={76} color="#a39d87" />
+      </div>
       <div className="badge-name">{name || '이름을 입력하세요'}</div>
       <div className="badge-role">{role}</div>
       <div className="badge-intro">{intro}</div>
@@ -20,9 +25,22 @@ export default function Badge({ tag, photoSrc, name, role, intro, links = [], po
       </div>
       <div className="portfolio-preview">
         {portfolio.map((p, i) => (
-          <div className="pf" key={i}>
-            <div className="pf-t">{p.title}</div>
-            <div className="pf-d">{p.desc || ''}</div>
+          <div className="pf" key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {p.image && (
+              <img src={p.image} alt="" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+            )}
+            <div>
+              <div className="pf-t">
+                {p.link ? (
+                  <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+                    {p.title}
+                  </a>
+                ) : (
+                  p.title
+                )}
+              </div>
+              <div className="pf-d">{p.desc || ''}</div>
+            </div>
           </div>
         ))}
       </div>

@@ -138,18 +138,6 @@ h1 {
   margin-top: 2px; white-space: nowrap;
 }
 .star-pending { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.28); }
-.verse-caption {
-  margin: 0 auto 14px; max-width: 300px;
-  text-align: center; font-family: 'Nanum Myeongjo', serif; color: var(--sub);
-  font-size: 12px; line-height: 1.6; word-break: keep-all;
-}
-.save-shot-btn {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
-  color: var(--cyan); background: rgba(79,209,232,0.1);
-  border: 1px solid rgba(79,209,232,0.35); border-radius: 6px;
-  padding: 4px 8px; cursor: pointer; white-space: nowrap;
-}
-.save-shot-btn:disabled { opacity: 0.6; cursor: default; }
 
 .rank-row {
   display: flex; align-items: center; gap: 6px;
@@ -255,23 +243,6 @@ h1 {
 }
 .badge.on { color: var(--cyan); border-color: var(--cyan); }
 
-.gallery-tab-row {
-  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px;
-  scrollbar-width: thin;
-}
-.gallery-tab-btn {
-  flex: 0 0 auto;
-  background: var(--card); border: 1px solid var(--line); border-radius: 999px;
-  color: var(--sub); font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-  padding: 6px 10px; cursor: pointer; white-space: nowrap;
-  transition: background .15s ease, color .15s ease, border-color .15s ease;
-}
-.gallery-tab-btn.on { background: var(--gold); color: #0B0E1F; border-color: var(--gold); font-weight: 700; }
-.gallery-date-label {
-  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--sub);
-  margin-bottom: 8px; letter-spacing: 0.04em;
-}
-
 .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .chip-btn {
   background: var(--card); border: 1px solid var(--line); border-radius: 999px;
@@ -301,8 +272,4 @@ h1 {
 .empty-notice {
   text-align: center; padding: 40px 20px; color: var(--sub);
   font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.7;
-}
-.verse-line {
-  margin-top: 14px; font-family: 'Nanum Myeongjo', serif; color: var(--star);
-  font-size: 13px; line-height: 1.7; text-align: center;
 }

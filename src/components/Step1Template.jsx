@@ -7,10 +7,10 @@ const TEMPLATES = [
 ];
 
 export default function Step1Template() {
-  const { step, template, selectTemplate, goStep } = useCard();
+  const { step, currentStepName, template, selectTemplate, goStep } = useCard();
 
   return (
-    <div className={`panel${step === 1 ? ' active' : ''}`}>
+    <div className={`panel${currentStepName === 'template' ? ' active' : ''}`}>
       <div className="tpl-grid">
         {TEMPLATES.map((t) => (
           <div
@@ -27,7 +27,7 @@ export default function Step1Template() {
       <div className="hint">체험 시간은 유형에 따라 1~3분 정도 소요됩니다.</div>
       <div className="nav-row">
         <span></span>
-        <button className="primary" disabled={!template} onClick={() => goStep(2)}>
+        <button className="primary" disabled={!template} onClick={() => goStep(step + 1)}>
           다음
         </button>
       </div>

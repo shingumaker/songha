@@ -1,7 +1,6 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
-import { collection, doc, getCountFromServer, setDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadString } from 'firebase/storage';
-import { db, storage } from '../lib/firebase';
+import { collection, doc, setDoc } from 'firebase/firestore/lite';
+import { db } from '../lib/firebase';
 
 const CardContext = createContext(null);
 
@@ -26,11 +25,84 @@ const TEMPLATE_COPY = {
   },
 };
 
+const PROFILE_STYLE_META = {
+  colorful: { label: '컬러 카드형', hint: '따뜻한 색감의 스케치 아이콘 카드' },
+  minimal: { label: '미니멀 레주메형', hint: '흑백, 깔끔한 섹션 구분' },
+  gamestat: { label: '게임 스탯형', hint: '다크 테마, 능력치 바 + 퀘스트' },
+  scrapbook: { label: '스크랩북형', hint: '워시테이프와 손글씨 메모' },
+  sparkle: { label: '글로시 스파클형', hint: '파스텔 그라디언트 + 별 장식' },
+  browser: { label: '브라우저 창형', hint: '겹쳐진 앱 창 콜라주' },
+  vintage: { label: '빈티지 여행증형', hint: '오래된 종이와 별 테두리' },
+  neon: { label: '네온 픽셀형', hint: '다크 배경 + 네온 글로우' },
+  linkbio: { label: '링크형', hint: 'SNS·링크를 모아 보여주는 링크인바이오 페이지' },
+};
+
+const CARD_STYLE_META = {
+  civicpass: { label: '시빅 패스', hint: '그린 그라데이션 배너 + 크레딧카드형 ID' },
+  techpass: { label: '테크 패스', hint: '다크 홀로그래픽 액세스 카드' },
+  license: { label: '라이선스형', hint: '별 테두리 + 필기체 서명란의 빈티지 증서' },
+  membership: { label: '멤버십 카드형', hint: '팀 원형 뱃지 + 손글씨 낙서 멤버십 카드' },
+  republic: { label: '공화국 신분증형', hint: '메이커스페이스 공식 멤버' },
+};
+
+const STYLE_META = { ...PROFILE_STYLE_META, ...CARD_STYLE_META };
+
+const PROFILE_STYLE_KEYS = Object.keys(PROFILE_STYLE_META);
+const CARD_STYLE_KEYS = Object.keys(CARD_STYLE_META);
+const STYLE_KEYS = Object.keys(STYLE_META);
+
+const STEP_SEQUENCES = {
+  profile: ['template', 'style', 'info', 'personality', 'photo', 'done'],
+  card: ['style', 'info', 'personality', 'photo', 'done'],
+};
+
+const STEP_LABELS = {
+  template: '유형선택',
+  info: '정보입력',
+  personality: '성격·취향',
+  style: '스타일',
+  photo: '사진',
+  done: '발급',
+};
+
+const AVATAR_ICONS = ['🚀', '🎨', '🧠', '⚡', '🌱', '🎯', '🦄', '🐝'];
+
 function randomId() {
   return Math.random().toString(36).slice(2, 8);
 }
 
-const SAVE_TIMEOUT_MS = 6000;
+function pickRandomStyle(keys) {
+  return keys[Math.floor(Math.random() * keys.length)];
+}
+
+// Photos are stored inline on the Firestore card document (no Storage
+// bucket needed), so every photo source (upload or AI-generated) must be
+// downscaled well under Firestore's 1MiB field limit before it's saved.
+function resizeImageDataUrl(src, maxSize = 320, quality = 0.8) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height) {
+        if (width > maxSize) {
+          height = Math.round((height * maxSize) / width);
+          width = maxSize;
+        }
+      } else if (height > maxSize) {
+        width = Math.round((width * maxSize) / height);
+        height = maxSize;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = src;
+  });
+}
+
+const SAVE_TIMEOUT_MS = 15000;
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -47,18 +119,35 @@ const initialFields = {
   contact: '',
 };
 
-export function CardProvider({ children }) {
+export function CardProvider({ children, mode = 'profile', initialCard = null }) {
+  const styleKeys = mode === 'card' ? CARD_STYLE_KEYS : PROFILE_STYLE_KEYS;
+  const stepSequence = STEP_SEQUENCES[mode] || STEP_SEQUENCES.profile;
   const [step, setStep] = useState(1);
-  const [template, setTemplate] = useState(null);
-  const [fields, setFields] = useState(initialFields);
-  const [links, setLinks] = useState(['']);
-  const [portfolio, setPortfolio] = useState([]);
-  const [photoPreview, setPhotoPreview] = useState(null);
-  const [consent, setConsent] = useState(false);
+  const [template, setTemplate] = useState(initialCard?.template || (mode === 'card' ? 'profile' : null));
+  const [fields, setFields] = useState(() =>
+    initialCard
+      ? {
+          name: initialCard.name || '',
+          org: initialCard.org || '',
+          role: initialCard.role || '',
+          intro: initialCard.intro || '',
+          contact: initialCard.contact || '',
+        }
+      : initialFields,
+  );
+  const [links, setLinks] = useState(() => (initialCard?.links?.length ? initialCard.links : ['']));
+  const [portfolio, setPortfolio] = useState(() => initialCard?.portfolio || []);
+  const [personality, setPersonality] = useState(() => initialCard?.personality || []);
+  const [favorites, setFavorites] = useState(() => initialCard?.favorites || []);
+  const [certifications, setCertifications] = useState(() => initialCard?.certifications || []);
+  const [skills, setSkills] = useState(() => initialCard?.skills || []);
+  const [style, setStyle] = useState(initialCard?.style || null);
+  const [photoPreview, setPhotoPreview] = useState(initialCard?.photo || null);
+  const [avatarIcon, setAvatarIcon] = useState(initialCard?.avatarIcon || null);
+  const [consent, setConsent] = useState(!!initialCard);
   const [issuing, setIssuing] = useState(false);
   const [statusLine, setStatusLine] = useState('');
   const [issuedCard, setIssuedCard] = useState(null);
-  const [galleryCount, setGalleryCount] = useState(null);
 
   const selectTemplate = useCallback((t) => {
     setTemplate(t);
@@ -87,7 +176,7 @@ export function CardProvider({ children }) {
   }, []);
 
   const addPortfolioItem = useCallback(() => {
-    setPortfolio((prev) => (prev.length >= 2 ? prev : [...prev, { title: '', desc: '' }]));
+    setPortfolio((prev) => (prev.length >= 2 ? prev : [...prev, { title: '', desc: '', link: '', image: '' }]));
   }, []);
 
   const updatePortfolioItem = useCallback((idx, key, value) => {
@@ -98,74 +187,203 @@ export function CardProvider({ children }) {
     setPortfolio((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
-  const handlePhotoFile = useCallback((file) => {
+  const handlePortfolioImageFile = useCallback((idx, file) => {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setPhotoPreview(ev.target.result);
+    reader.onload = async (ev) => {
+      // Smaller/lower-quality than the profile photo — there can be two of
+      // these plus a profile photo in the same Firestore document.
+      const resized = await resizeImageDataUrl(ev.target.result, 240, 0.7);
+      setPortfolio((prev) => prev.map((p, i) => (i === idx ? { ...p, image: resized } : p)));
+    };
     reader.readAsDataURL(file);
+  }, []);
+
+  const addPersonalityItem = useCallback(() => {
+    setPersonality((prev) => (prev.length >= 3 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updatePersonalityItem = useCallback((idx, key, value) => {
+    setPersonality((prev) => prev.map((p, i) => (i === idx ? { ...p, [key]: value } : p)));
+  }, []);
+
+  const removePersonalityItem = useCallback((idx) => {
+    setPersonality((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const addFavoriteItem = useCallback(() => {
+    setFavorites((prev) => (prev.length >= 4 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updateFavoriteItem = useCallback((idx, key, value) => {
+    setFavorites((prev) => prev.map((f, i) => (i === idx ? { ...f, [key]: value } : f)));
+  }, []);
+
+  const removeFavoriteItem = useCallback((idx) => {
+    setFavorites((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const addCertificationItem = useCallback(() => {
+    setCertifications((prev) => (prev.length >= 3 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updateCertificationItem = useCallback((idx, key, value) => {
+    setCertifications((prev) => prev.map((c, i) => (i === idx ? { ...c, [key]: value } : c)));
+  }, []);
+
+  const removeCertificationItem = useCallback((idx) => {
+    setCertifications((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const addSkillItem = useCallback(() => {
+    setSkills((prev) => (prev.length >= 6 ? prev : [...prev, { title: '', desc: '' }]));
+  }, []);
+
+  const updateSkillItem = useCallback((idx, key, value) => {
+    setSkills((prev) => prev.map((s, i) => (i === idx ? { ...s, [key]: value } : s)));
+  }, []);
+
+  const removeSkillItem = useCallback((idx) => {
+    setSkills((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
+  const selectStyle = useCallback((s) => {
+    setStyle(s === 'random' ? pickRandomStyle(styleKeys) : s);
+  }, [styleKeys]);
+
+  const handlePhotoFile = useCallback((file) => {
+    if (!file) return;
+    setAvatarIcon(null);
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      setPhotoPreview(await resizeImageDataUrl(ev.target.result));
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const selectAvatarIcon = useCallback((icon) => {
+    setPhotoPreview(null);
+    setAvatarIcon(icon);
+  }, []);
+
+  const setAiPhoto = useCallback((dataUrl) => {
+    setAvatarIcon(null);
+    resizeImageDataUrl(dataUrl).then(setPhotoPreview);
   }, []);
 
   const resetFlow = useCallback(() => {
     setStep(1);
-    setTemplate(null);
+    setTemplate(mode === 'card' ? 'profile' : null);
     setFields(initialFields);
     setLinks(['']);
     setPortfolio([]);
+    setPersonality([]);
+    setFavorites([]);
+    setCertifications([]);
+    setSkills([]);
+    setStyle(null);
     setPhotoPreview(null);
+    setAvatarIcon(null);
     setConsent(false);
     setStatusLine('');
     setIssuedCard(null);
-  }, []);
+  }, [mode]);
 
   const issueCard = useCallback(async () => {
     setIssuing(true);
-    setStatusLine('카드 저장 중...');
-    const id = randomId();
+    setStatusLine(initialCard ? '수정 저장 중...' : '카드 저장 중...');
+    const id = initialCard?.id || randomId();
+    const finalStyle = style || pickRandomStyle(styleKeys);
+    // Edits are authenticated by echoing back the same editKey the card was
+    // created with — Firestore rules reject an update whose editKey doesn't
+    // match what's already stored, so only a browser that has this card's
+    // key (saved to localStorage at creation) can successfully save edits.
+    const editKey = initialCard?.editKey || `${randomId()}${randomId()}`;
+
+    // If no one-line intro was written, try to have AI fill it in from
+    // whatever profile info exists — best-effort: on failure/timeout we just
+    // save with an empty intro rather than blocking issuance on it.
+    let introText = fields.intro.trim();
+    if (!introText) {
+      try {
+        const introRes = await withTimeout(
+          fetch('/api/generate-intro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: fields.name.trim(),
+              org: fields.org.trim(),
+              role: fields.role.trim(),
+              personality: personality.filter((p) => p.title).map((p) => p.title),
+              favorites: favorites.filter((f) => f.title).map((f) => f.title),
+            }),
+          }),
+          8000,
+        );
+        const introData = await introRes.json();
+        if (introRes.ok && introData?.intro) introText = introData.intro;
+      } catch (err) {
+        console.error('자동 한 줄 소개 생성 실패:', err);
+      }
+    }
 
     const record = {
       id,
+      editKey,
       template,
+      style: finalStyle,
       name: fields.name.trim(),
       org: fields.org.trim(),
       role: fields.role.trim(),
-      intro: fields.intro.trim(),
+      intro: introText,
       contact: fields.contact.trim(),
       links: links.filter((l) => l && l.trim()),
       portfolio: portfolio.filter((p) => p.title),
-      createdAt: Date.now(),
+      personality: personality.filter((p) => p.title),
+      favorites: favorites.filter((f) => f.title),
+      certifications: certifications.filter((c) => c.title),
+      skills: skills.filter((s) => s.title),
+      createdAt: initialCard?.createdAt || Date.now(),
     };
+    if (photoPreview) record.photo = photoPreview;
+    else if (avatarIcon) record.avatarIcon = avatarIcon;
 
     try {
-      if (photoPreview) {
-        const photoRef = ref(storage, `cards/${id}.jpg`);
-        await withTimeout(uploadString(photoRef, photoPreview, 'data_url'), SAVE_TIMEOUT_MS);
-        record.photoURL = await withTimeout(getDownloadURL(photoRef), SAVE_TIMEOUT_MS);
-      }
-
       await withTimeout(setDoc(doc(collection(db, 'cards'), id), record), SAVE_TIMEOUT_MS);
-
-      try {
-        const snap = await withTimeout(getCountFromServer(collection(db, 'cards')), SAVE_TIMEOUT_MS);
-        setGalleryCount(snap.data().count);
-      } catch {
-        // count is a nice-to-have; ignore failures
-      }
-
       setStatusLine('저장 완료');
-    } catch {
+      if (!initialCard) {
+        try {
+          localStorage.setItem(`songha_edit_${id}`, editKey);
+        } catch {
+          // ignore — worst case this browser just can't edit it later
+        }
+      }
+    } catch (err) {
+      console.error('카드 저장 실패:', err);
+      if (initialCard) {
+        // Unlike a brand-new card, silently "succeeding" here would show a
+        // fake success screen while the edit was actually lost — surface the
+        // failure instead of advancing past it.
+        setStatusLine('수정 내용을 저장하지 못했습니다. 네트워크를 확인하고 다시 시도해 주세요.');
+        setIssuing(false);
+        return;
+      }
       setStatusLine('데모 모드로 진행 중 (저장 없이 미리보기만 제공)');
     }
 
     const url = `${window.location.origin}/card/${id}`;
-    setIssuedCard({ id, url, photoURL: record.photoURL || photoPreview });
+    setIssuedCard({ id, url, createdAt: record.createdAt });
     setIssuing(false);
-    goStep(4);
-  }, [template, fields, links, portfolio, photoPreview, goStep]);
+    goStep(stepSequence.length);
+  }, [template, style, fields, links, portfolio, personality, favorites, certifications, skills, photoPreview, avatarIcon, goStep, styleKeys, stepSequence, initialCard]);
 
   const value = useMemo(
     () => ({
       step,
       goStep,
+      stepSequence,
+      currentStepName: stepSequence[step - 1],
+      styleKeys,
       template,
       selectTemplate,
       templateCopy: template ? TEMPLATE_COPY[template] : null,
@@ -179,20 +397,45 @@ export function CardProvider({ children }) {
       addPortfolioItem,
       updatePortfolioItem,
       removePortfolioItem,
+      handlePortfolioImageFile,
+      personality,
+      addPersonalityItem,
+      updatePersonalityItem,
+      removePersonalityItem,
+      favorites,
+      addFavoriteItem,
+      updateFavoriteItem,
+      removeFavoriteItem,
+      certifications,
+      addCertificationItem,
+      updateCertificationItem,
+      removeCertificationItem,
+      skills,
+      addSkillItem,
+      updateSkillItem,
+      removeSkillItem,
+      style,
+      selectStyle,
       photoPreview,
       handlePhotoFile,
+      avatarIcon,
+      selectAvatarIcon,
+      setAiPhoto,
+      avatarIconOptions: AVATAR_ICONS,
       consent,
       setConsent,
       issuing,
       statusLine,
       issuedCard,
-      galleryCount,
       issueCard,
       resetFlow,
+      isEditMode: !!initialCard,
     }),
     [
       step,
       goStep,
+      stepSequence,
+      styleKeys,
       template,
       selectTemplate,
       fields,
@@ -205,15 +448,37 @@ export function CardProvider({ children }) {
       addPortfolioItem,
       updatePortfolioItem,
       removePortfolioItem,
+      handlePortfolioImageFile,
+      personality,
+      addPersonalityItem,
+      updatePersonalityItem,
+      removePersonalityItem,
+      favorites,
+      addFavoriteItem,
+      updateFavoriteItem,
+      removeFavoriteItem,
+      certifications,
+      addCertificationItem,
+      updateCertificationItem,
+      removeCertificationItem,
+      skills,
+      addSkillItem,
+      updateSkillItem,
+      removeSkillItem,
+      style,
+      selectStyle,
       photoPreview,
       handlePhotoFile,
+      avatarIcon,
+      selectAvatarIcon,
+      setAiPhoto,
       consent,
       issuing,
       statusLine,
       issuedCard,
-      galleryCount,
       issueCard,
       resetFlow,
+      initialCard,
     ],
   );
 
@@ -226,4 +491,4 @@ export function useCard() {
   return ctx;
 }
 
-export { TEMPLATE_COPY };
+export { TEMPLATE_COPY, STYLE_META, STYLE_KEYS, PROFILE_STYLE_KEYS, CARD_STYLE_KEYS, STEP_LABELS };

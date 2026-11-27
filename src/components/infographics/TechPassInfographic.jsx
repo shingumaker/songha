@@ -1,0 +1,271 @@
+import AvatarDisplay from './AvatarDisplay';
+import { normalizeUrl } from './linkUtils';
+
+const ACCENT = '#e6b45a';
+
+// Same reasoning as CivicPassInfographic: these px values were tuned for the
+// ~350px width this card happens to render at in the create-flow's two-column
+// layout. Converting to cqw/cqh (relative to that 350x218.75 reference box)
+// makes the card scale correctly at other widths too, e.g. the full-width
+// issued-profile page, instead of staying pinned at its original small size.
+const CARD_W = 350;
+const CARD_H = CARD_W / 1.6;
+const cqw = (px) => `${(px / CARD_W) * 100}cqw`;
+const cqh = (px) => `${(px / CARD_H) * 100}cqh`;
+
+function formatIdNumber(id) {
+  const base = (id || 'guest0').toUpperCase().padEnd(6, '0').repeat(2).slice(0, 12);
+  return base.match(/.{1,4}/g).join('-');
+}
+
+const BAR_PATTERN = [
+  [2, 1], [1, 1], [1, 1], [1, 1], [2, 2], [1, 2], [2, 1], [1, 1], [1, 1], [3, 2],
+  [1, 2], [1, 2], [2, 1], [2, 2], [2, 1], [1, 1], [2, 1], [1, 1], [2, 1], [1, 1],
+  [1, 1], [2, 2], [2, 1], [2, 2], [3, 1], [2, 1], [3, 1], [2, 2], [2, 2], [1, 1],
+  [1, 1], [2, 1], [1, 1], [2, 1], [2, 1], [1, 1], [2, 1], [2, 1], [2, 1], [3, 1],
+  [3, 1], [1, 2], [2, 1], [2, 2], [1, 1], [1, 1], [1, 1], [2, 1], [1, 1], [3, 1],
+  [1, 2], [2, 2], [1, 1], [1, 1], [2, 0],
+];
+
+const QR_ROWS = [
+  [1, 0, 1, 1, 0],
+  [0, 1, 0, 0, 1],
+  [1, 0, 1, 0, 1],
+  [0, 1, 0, 1, 0],
+  [1, 0, 1, 0, 1],
+];
+
+export default function TechPassInfographic({ card }) {
+  const { name, org, role, intro, template, links, portfolio, personality, favorites, certifications, skills, photo, avatarIcon, id } = card;
+  const hasPortfolio = template === 'portfolio' && portfolio?.length > 0;
+
+  return (
+    <div style={{ fontFamily: "'Noto Sans KR',sans-serif", width: '100%' }}>
+      <div
+        style={{
+          aspectRatio: '1.6 / 1',
+          containerType: 'size',
+          borderRadius: 0,
+          overflow: 'hidden',
+          position: 'relative',
+          boxSizing: 'border-box',
+          background: 'linear-gradient(160deg, #14171c 0%, #1f242c 100%)',
+          boxShadow: '0 14px 32px rgba(0,0,0,0.45)',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage:
+              'repeating-linear-gradient(115deg, rgba(230,180,90,0.05) 0px, rgba(230,180,90,0.05) 1px, transparent 1px, transparent 7px)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: cqw(4),
+            background: 'linear-gradient(180deg, #e6b45a, #7a4dd1, #2fb8c8, #e6b45a)',
+          }}
+        />
+
+        <div
+          style={{
+            position: 'relative',
+            height: '100%',
+            boxSizing: 'border-box',
+            padding: `${cqh(10)} ${cqw(12)} ${cqh(10)} ${cqw(14)}`,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: cqh(6),
+            color: '#e8e4da',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(5) }}>
+              <div
+                style={{
+                  width: cqw(14),
+                  height: cqh(14),
+                  borderRadius: 0,
+                  background: ACCENT,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: "'Space Grotesk',sans-serif",
+                  fontWeight: 800,
+                  fontSize: cqw(8),
+                  color: '#14171c',
+                }}
+              >
+                E
+              </div>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: cqw(8), letterSpacing: '0.03em' }}>
+                EXPO ACCESS
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: cqw(4), fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(6), color: ACCENT, letterSpacing: '0.05em' }}>
+              <span style={{ width: cqw(4), height: cqh(4), borderRadius: '50%', background: ACCENT, display: 'inline-block' }} />
+              LEVEL 2 · ACTIVE
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: cqw(10), alignItems: 'center', flexGrow: 1 }}>
+            <div
+              style={{
+                width: cqw(92),
+                height: cqh(108),
+                borderRadius: 0,
+                border: '1.5px solid rgba(232,228,218,0.25)',
+                background: 'rgba(255,255,255,0.04)',
+                flexShrink: 0,
+                overflow: 'hidden',
+              }}
+            >
+              <AvatarDisplay photo={photo} avatarIcon={avatarIcon} size={92} color="rgba(232,228,218,0.3)" />
+            </div>
+
+            <div style={{ flexGrow: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 800, fontSize: cqw(15), color: '#fff', lineHeight: 1.25 }}>
+                {name}
+              </div>
+              <div style={{ fontFamily: "'Noto Sans KR',sans-serif", fontWeight: 700, fontSize: cqw(13), color: ACCENT, marginTop: cqh(3), lineHeight: 1.3 }}>
+                {org || ' '}
+              </div>
+              <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(11), color: 'rgba(232,228,218,0.65)', marginTop: cqh(1), letterSpacing: '0.01em', lineHeight: 1.3 }}>
+                {role || ' '}
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(5,${cqw(4)})`, gridTemplateRows: `repeat(5,${cqh(4)})`, gap: `${cqh(1)} ${cqw(1)}`, flexShrink: 0 }}>
+              {QR_ROWS.flat().map((on, i) => (
+                <div key={i} style={{ background: on ? '#e8e4da' : 'transparent' }} />
+              ))}
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto 1fr',
+              alignItems: 'end',
+              columnGap: cqw(8),
+              borderTop: '1px solid rgba(232,228,218,0.15)',
+              paddingTop: cqh(6),
+            }}
+          >
+            <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: cqw(7), color: 'rgba(232,228,218,0.75)', letterSpacing: '0.04em', justifySelf: 'start' }}>
+              ID · {formatIdNumber(id)}
+            </div>
+            <div style={{ justifySelf: 'center', display: 'flex', alignItems: 'flex-end', height: cqh(12) }}>
+              {BAR_PATTERN.map(([w, mr], i) => (
+                <div key={i} style={{ width: cqw(w), height: cqh(12), background: '#fff', marginRight: cqw(mr) }} />
+              ))}
+            </div>
+            <div style={{ justifySelf: 'end', fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: cqw(7), color: 'rgba(232,228,218,0.5)', letterSpacing: '0.06em' }}>
+              EXPO 2026
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {(intro || personality?.length > 0 || favorites?.length > 0 || certifications?.length > 0 || skills?.length > 0 || hasPortfolio || links?.length > 0) && (
+        <div style={{ marginTop: 16, background: '#1f242c', borderRadius: 12, padding: '16px 18px', boxShadow: '0 12px 30px rgba(0,0,0,0.35)' }}>
+          {intro && (
+            <div style={{ fontSize: 12, color: '#e8e4da', fontStyle: 'italic', lineHeight: 1.6, textAlign: 'center' }}>
+              MOTTO &middot; &ldquo;{intro}&rdquo;
+            </div>
+          )}
+          {personality?.length > 0 && (
+            <div style={{ marginTop: intro ? 14 : 0 }}>
+              <SectionLabel>DISTINGUISHING FEATURES / 특기사항</SectionLabel>
+              <div style={{ fontSize: 12, color: '#e8e4da', lineHeight: 1.9 }}>{personality.map((p) => p.title).join(' · ')}</div>
+            </div>
+          )}
+          {favorites?.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <SectionLabel>ENDORSEMENTS / 관심 분야</SectionLabel>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 6 }}>
+                {favorites.map((f, i) => (
+                  <Stamp key={i} label={f.title} />
+                ))}
+              </div>
+            </div>
+          )}
+          {certifications?.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <SectionLabel>CERTIFICATIONS / 자격증</SectionLabel>
+              <div style={{ fontSize: 12, color: '#e8e4da', lineHeight: 1.9 }}>{certifications.map((c) => c.title).join(' · ')}</div>
+            </div>
+          )}
+          {skills?.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              <SectionLabel>SKILLS / 스킬</SectionLabel>
+              <div style={{ fontSize: 12, color: '#e8e4da', lineHeight: 1.9 }}>{skills.map((s) => s.title).join(' · ')}</div>
+            </div>
+          )}
+          {(hasPortfolio || links?.length > 0) && (
+            <div style={{ marginTop: 14, background: 'rgba(232,228,218,0.06)', border: '1px solid rgba(232,228,218,0.15)', borderRadius: 4, padding: '10px 12px' }}>
+              <SectionLabel>{hasPortfolio ? '프로젝트' : '링크'}</SectionLabel>
+              {hasPortfolio
+                ? portfolio.map((p, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                      {p.image && (
+                        <img src={p.image} alt="" style={{ width: 20, height: 20, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+                      )}
+                      <div style={{ fontSize: 12, color: '#e8e4da' }}>
+                        {p.link ? (
+                          <a href={normalizeUrl(p.link)} target="_blank" rel="noreferrer" style={{ color: '#e8e4da' }}>
+                            {p.title}
+                          </a>
+                        ) : (
+                          p.title
+                        )}
+                        {p.desc && ` — ${p.desc}`}
+                      </div>
+                    </div>
+                  ))
+                : links.map((l, i) => (
+                    <div key={i} style={{ fontSize: 12, color: '#e8e4da', marginTop: 4, fontFamily: "'IBM Plex Mono',monospace" }}>
+                      {l}
+                    </div>
+                  ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionLabel({ children }) {
+  return (
+    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 10, color: ACCENT, letterSpacing: '0.06em' }}>
+      {children}
+    </div>
+  );
+}
+
+function Stamp({ label }) {
+  return (
+    <div
+      style={{
+        border: `1.5px dashed ${ACCENT}`,
+        borderRadius: '50%',
+        width: 62,
+        height: 62,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        transform: 'rotate(-6deg)',
+        flexShrink: 0,
+      }}
+    >
+      <span style={{ fontSize: 9, fontWeight: 700, color: ACCENT, lineHeight: 1.2, padding: '0 4px' }}>{label}</span>
+    </div>
+  );
+}
